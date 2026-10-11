@@ -31,7 +31,10 @@ Progress is saved in the browser. When the page is opened as a Claude artifact, 
 
 ## Deploy
 
-```bash
-cd vercel-site
-vercel deploy --prod
-```
+The Vercel project is connected to this repo:
+
+- Every push to `main` deploys to production at https://interview-prep-in-60.vercel.app
+- Pushes to other branches and pull requests get preview deployments
+- Vercel serves the `vercel-site/` folder as a static site, with no build step
+
+After editing `dsa-crash-course.html`, regenerate `vercel-site/index.html` (the same content wrapped in a full HTML document with the Mermaid script), then commit and push.
