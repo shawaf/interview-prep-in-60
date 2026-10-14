@@ -1,5 +1,5 @@
 // Offline support: precache the app shell, then cache fonts/libraries as they're used.
-const CACHE = 'prep60-d5df14c877ca';
+const CACHE = 'prep60-f539e0334156';
 const PRECACHE = ['/', '/manifest.webmanifest', '/icon.svg', '/icon-192.png', '/icon-512.png', 'https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js', 'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => Promise.all(PRECACHE.map(u =>
