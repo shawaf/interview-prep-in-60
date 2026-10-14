@@ -6826,6 +6826,579 @@ def run_evals(cases, system):
 </div><!-- /s-ai -->
 
 <!-- ===================================================== -->
+<!-- ===================================================== -->
+<!-- MOBILE ENGINEERING                                     -->
+<!-- ===================================================== -->
+<div class="subject" id="s-mb" data-s="mb" data-name="Mobile Engineering" hidden>
+<header>
+  <p class="eyebrow">Crash course · iOS, Android and mobile system design interviews</p>
+  <h1>Mobile engineering in <span>60 minutes</span></h1>
+  <p class="lede">Mobile loops add platform rounds on top of coding: app lifecycle, smooth rendering, threading, offline data, performance, security and release, and a <b>mobile system design</b> round where you design the client app, not the backend. Eleven topics cover what interviewers probe on iOS (Swift, SwiftUI/UIKit), Android (Kotlin, Jetpack Compose) and cross-platform, each with an animation and model answers. The <b>Deep dive</b> tab opens with a mobile interview playbook and ends with two full client designs.</p>
+</header>
+<div class="tabs" role="tablist" aria-label="Mobile sections">
+  <button role="tab" id="mb-tb-crash" aria-selected="true" aria-controls="mb-crash" data-tab="crash">Crash course · 60 min</button>
+  <button role="tab" id="mb-tb-deep" aria-selected="false" aria-controls="mb-deep" data-tab="deep">Deep dive · topic by topic</button>
+</div>
+<div id="mb-crash" class="panel" data-panel="crash" role="tabpanel" aria-labelledby="mb-tb-crash">
+  <nav class="map" aria-label="Minute map">
+    <a href="#mb-life" style="--m:5"><b>0–5</b>Lifecycle</a>
+    <a href="#mb-frame" style="--m:6"><b>5–11</b>Smooth UI</a>
+    <a href="#mb-list" style="--m:5"><b>11–16</b>Lists</a>
+    <a href="#mb-arch" style="--m:6"><b>16–22</b>Architecture</a>
+    <a href="#mb-conc" style="--m:5"><b>22–27</b>Concurrency</a>
+    <a href="#mb-offline" style="--m:6"><b>27–33</b>Offline &amp; sync</a>
+    <a href="#mb-store" style="--m:4"><b>33–37</b>Storage</a>
+    <a href="#mb-perf" style="--m:5"><b>37–42</b>Performance</a>
+    <a href="#mb-sec" style="--m:4"><b>42–46</b>Security</a>
+    <a href="#mb-release" style="--m:5"><b>46–51</b>Release</a>
+    <a href="#mb-sysd" style="--m:9"><b>51–60</b>Mobile system design</a>
+  </nav>
+  <p class="maplegend">Code samples show both Kotlin (Android) and Swift (iOS). Interviewers expect depth in one platform and awareness of the other.</p>
+
+<section id="mb-life" data-deep="mb-d-android">
+  <div><p class="eyebrow">Minutes 0–5</p><h2>App lifecycle</h2></div>
+  <ul class="pts">
+    <li>The OS, not your app, decides when you run. Apps move between <b>foreground</b>, <b>background</b> and <b>suspended</b>, and can be <b>killed at any time</b> to reclaim memory.</li>
+    <li><b>Android:</b> an Activity goes through onCreate → onStart → onResume, then onPause → onStop → onDestroy. A <b>configuration change</b> (rotation, dark mode, language) destroys and recreates it, so state belongs in a <b>ViewModel</b> (survives rotation) and <b>SavedStateHandle</b> (survives process death).</li>
+    <li><b>iOS:</b> scene phases are active, inactive and background. Background time is short, and the app is then suspended. Use state restoration (or your own persistence) for anything the user expects to come back to.</li>
+    <li>Interviewers love <b>process death</b>: "the user opens your app after 2 hours in the background, and they're on screen 3 of a form. What happens?"</li>
+  </ul>
+  <div class="widget" id="w-mb-life">
+    <div class="whead"><span class="wtitle">Animation · lifecycle events</span>
+      <div class="controls" id="life-mode"><button data-m="android" class="sel">Android</button><button data-m="ios">iOS</button></div></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+<pre><code>// Android: state that survives rotation (ViewModel) and process death (SavedStateHandle)
+class CheckoutViewModel(private val saved: SavedStateHandle) : ViewModel() {
+    val step = saved.getStateFlow("step", 1)          // restored after process death
+    fun next() { saved["step"] = step.value + 1 }
+}
+
+// iOS (SwiftUI): react to scene phase changes
+.onChange(of: scenePhase) { _, phase in
+    if phase == .background { draftStore.save(form) }   // persist before suspension
+}</code></pre>
+  <div class="links">
+    <a class="watch" href="https://developer.android.com/guide/components/activities/activity-lifecycle" target="_blank" rel="noopener">Android: activity lifecycle</a>
+    <a class="watch" href="https://developer.apple.com/documentation/uikit/managing-your-app-s-life-cycle" target="_blank" rel="noopener">Apple: managing your app's life cycle</a>
+  </div>
+</section>
+
+<section id="mb-frame" data-deep="mb-d-perf">
+  <div><p class="eyebrow">Minutes 5–11</p><h2>Smooth UI: the frame budget</h2></div>
+  <ul class="pts">
+    <li>At 60 Hz the screen redraws every <b>16.7 ms</b>; at 120 Hz, every <b>8.3 ms</b>. If the main thread takes longer, frames are dropped and the user sees <b>jank</b>.</li>
+    <li>The <b>main (UI) thread</b> handles input, layout, drawing and animations. Never block it with network calls, disk I/O, JSON parsing of big payloads, image decoding, or heavy computation.</li>
+    <li>Common causes of jank: decoding images on the main thread, deep or nested layouts, too much recomposition (Compose) or view-body re-evaluation (SwiftUI), synchronous database reads, and garbage-collection or allocation churn in scroll paths.</li>
+    <li>Measure, don't guess: Android Studio Profiler, Perfetto, Macrobenchmark and JankStats on Android; Instruments (Time Profiler, Hangs, Animation Hitches) on iOS.</li>
+  </ul>
+  <div class="widget" id="w-mb-frame">
+    <div class="whead"><span class="wtitle">Animation · frames against the 16.7 ms budget</span></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+  <div class="links">
+    <a class="watch" href="https://developer.android.com/topic/performance/vitals/render" target="_blank" rel="noopener">Android: slow rendering</a>
+    <a class="watch" href="https://www.youtube.com/results?search_query=WWDC+explore+UI+animation+hitches+and+the+render+loop" target="_blank" rel="noopener">Watch: WWDC on hitches and the render loop</a>
+  </div>
+</section>
+
+<section id="mb-list" data-deep="mb-d-perf">
+  <div><p class="eyebrow">Minutes 11–16</p><h2>Lists &amp; view recycling</h2></div>
+  <ul class="pts">
+    <li>A feed of 10,000 items can't have 10,000 views. <b>RecyclerView</b> (Android Views), <b>LazyColumn</b> (Compose), <b>UICollectionView/UITableView</b> (UIKit) and <b>List/LazyVStack</b> (SwiftUI) create only the views that are visible and <b>reuse</b> them as you scroll.</li>
+    <li>Binding a recycled view must be <b>fast and complete</b>: reset every field, cancel the old image load, and never do I/O in bind.</li>
+    <li>Give items <b>stable IDs/keys</b> so the list can animate inserts and moves correctly, and use diffing (DiffUtil, diffable data sources) instead of reloading everything.</li>
+    <li>Paginate (cursor-based), prefetch the next page before the user hits the end, and prefetch images for upcoming rows.</li>
+  </ul>
+  <div class="widget" id="w-mb-recycle">
+    <div class="whead"><span class="wtitle">Animation · 7 views showing 1,000 items</span></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+<pre><code>// Compose: stable keys + paging
+LazyColumn {
+    items(posts, key = { it.id }) { post -&gt; PostRow(post) }        // stable identity
+    item { LaunchedEffect(Unit) { viewModel.loadNextPage() } }      // prefetch near the end
+}
+
+// UIKit: a reused cell must reset everything and cancel stale work
+override func prepareForReuse() {
+    super.prepareForReuse()
+    imageTask?.cancel()        // otherwise the old image can land in the new row
+    avatar.image = nil
+}</code></pre>
+  <div class="links">
+    <a class="watch" href="https://www.youtube.com/results?search_query=recyclerview+how+view+recycling+works" target="_blank" rel="noopener">Watch: how view recycling works</a>
+  </div>
+</section>
+
+<section id="mb-arch" data-deep="mb-d-arch">
+  <div><p class="eyebrow">Minutes 16–22</p><h2>Architecture &amp; state</h2></div>
+  <ul class="pts">
+    <li>The common modern shape is <b>MVVM with unidirectional data flow</b>: the UI sends <b>events</b> to a ViewModel, the ViewModel exposes one immutable <b>UI state</b>, and the UI renders whatever state it's given.</li>
+    <li>Layers: <b>UI</b> (Compose/SwiftUI) → <b>ViewModel</b> (presentation logic, state) → <b>Repository</b> (decides cache vs network) → <b>data sources</b> (local DB, API). Domain/use-case layers are optional for bigger apps.</li>
+    <li>Declarative UI (Compose, SwiftUI) re-renders from state, so keep state minimal, derived values computed, and side effects out of render code.</li>
+    <li>Use dependency injection (Hilt/Koin on Android, initializer injection or a container on iOS) so every layer is testable with fakes.</li>
+  </ul>
+  <div class="widget" id="w-mb-udf">
+    <div class="whead"><span class="wtitle">Animation · unidirectional data flow with an optimistic like</span></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+<pre><code>data class FeedState(val posts: List&lt;Post&gt; = emptyList(), val loading: Boolean = false, val error: String? = null)
+
+class FeedViewModel(private val repo: FeedRepository) : ViewModel() {
+    private val _state = MutableStateFlow(FeedState())
+    val state: StateFlow&lt;FeedState&gt; = _state           // the UI only reads this
+
+    fun onLike(id: String) {
+        _state.update { s -&gt; s.copy(posts = s.posts.map { if (it.id == id) it.copy(liked = true) else it }) }
+        viewModelScope.launch {
+            runCatching { repo.like(id) }.onFailure {    // roll back on failure
+                _state.update { s -&gt; s.copy(posts = s.posts.map { if (it.id == id) it.copy(liked = false) else it },
+                                            error = "Couldn't like. Check your connection.") }
+            }
+        }
+    }
+}</code></pre>
+  <div class="links">
+    <a class="watch" href="https://developer.android.com/topic/architecture" target="_blank" rel="noopener">Android: guide to app architecture</a>
+    <a class="watch" href="https://www.youtube.com/results?search_query=MVVM+unidirectional+data+flow+jetpack+compose+swiftui" target="_blank" rel="noopener">Watch: MVVM and UDF</a>
+  </div>
+</section>
+
+<section id="mb-conc" data-deep="mb-d-ios">
+  <div><p class="eyebrow">Minutes 22–27</p><h2>Concurrency on mobile</h2></div>
+  <ul class="pts">
+    <li><b>Kotlin coroutines:</b> <code>viewModelScope.launch</code> starts work tied to the screen's lifetime, <code>withContext(Dispatchers.IO)</code> moves blocking work off the main thread, and <b>Flow</b> streams values over time.</li>
+    <li><b>Swift concurrency:</b> <code>async/await</code>, <code>Task</code>, <b>actors</b> for safe shared state, and <code>@MainActor</code> for anything that touches UI. GCD and OperationQueue are the older APIs, still common in interviews.</li>
+    <li><b>Structured concurrency:</b> child work is cancelled with its parent scope, so leaving a screen cancels its requests. No leaks, and no callbacks into dead screens.</li>
+    <li>Cancellation is <b>cooperative</b>: long loops must check for it (<code>ensureActive()</code>, <code>Task.checkCancellation()</code>).</li>
+  </ul>
+  <div class="widget" id="w-mb-conc">
+    <div class="whead"><span class="wtitle">Animation · main thread vs background work, and cancellation</span></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+<pre><code>// Swift: UI updates on the main actor, heavy work elsewhere, automatic cancellation with the view
+@MainActor final class ProfileModel: ObservableObject {
+    @Published var profile: Profile?
+    func load(id: String) async {
+        do {
+            let p = try await api.fetchProfile(id)       // suspends; main thread stays free
+            profile = p                                  // back on the main actor
+        } catch is CancellationError { /* view went away: do nothing */ }
+        catch { /* show an error state */ }
+    }
+}
+// SwiftUI: .task { await model.load(id: id) }   // cancelled automatically when the view disappears</code></pre>
+  <div class="links">
+    <a class="watch" href="https://kotlinlang.org/docs/coroutines-overview.html" target="_blank" rel="noopener">Kotlin coroutines guide</a>
+    <a class="watch" href="https://docs.swift.org/swift-book/documentation/the-swift-programming-language/concurrency/" target="_blank" rel="noopener">Swift concurrency (Swift book)</a>
+  </div>
+</section>
+
+<section id="mb-offline" data-deep="mb-d-offline">
+  <div><p class="eyebrow">Minutes 27–33</p><h2>Offline-first &amp; sync</h2></div>
+  <ul class="pts">
+    <li>Mobile networks drop constantly. <b>Offline-first</b> means the <b>local database is the source of truth</b> for the UI, and the network only updates the database.</li>
+    <li>Reads: show cached data instantly, refresh in the background (stale-while-revalidate). Writes: apply locally and optimistically, record them in an <b>outbox</b>, and sync when online.</li>
+    <li>Background sync with <b>WorkManager</b> (Android) or <b>BGTaskScheduler</b> (iOS), with constraints (network, battery) and exponential backoff.</li>
+    <li>Plan for <b>conflicts</b>: server-wins, last-write-wins with timestamps, field-level merges, or asking the user. Make every sync request <b>idempotent</b> (a client-generated ID per action).</li>
+  </ul>
+  <div class="widget" id="w-mb-offline">
+    <div class="whead"><span class="wtitle">Animation · writing offline, then syncing an outbox</span></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+  <div class="links">
+    <a class="watch" href="https://developer.android.com/topic/architecture/data-layer/offline-first" target="_blank" rel="noopener">Android: build an offline-first app</a>
+  </div>
+</section>
+
+<section id="mb-store" data-deep="mb-d-offline">
+  <div><p class="eyebrow">Minutes 33–37</p><h2>Local storage choices</h2></div>
+  <ul class="pts">
+    <li><b>Secrets</b> (tokens, keys): iOS <b>Keychain</b>, Android <b>Keystore</b>-backed encryption. Never plain preferences.</li>
+    <li><b>Small settings:</b> UserDefaults (iOS), DataStore (Android, replacing SharedPreferences).</li>
+    <li><b>Structured, queryable data:</b> SQLite via <b>Room</b> (Android) or <b>SwiftData/Core Data/GRDB</b> (iOS). Observe queries so the UI updates automatically.</li>
+    <li><b>Large blobs</b> (images, video, downloads): files in the cache directory (which the OS may clear) or app support directory, with your own size limit and eviction.</li>
+  </ul>
+  <div class="widget" id="w-mb-store">
+    <div class="whead"><span class="wtitle">Animation · where should this data live?</span></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+  <div class="links">
+    <a class="watch" href="https://developer.android.com/training/data-storage/room" target="_blank" rel="noopener">Android: Room</a>
+    <a class="watch" href="https://developer.apple.com/documentation/swiftdata" target="_blank" rel="noopener">Apple: SwiftData</a>
+  </div>
+</section>
+
+<section id="mb-perf" data-deep="mb-d-perf">
+  <div><p class="eyebrow">Minutes 37–42</p><h2>Performance: startup, memory, battery, size</h2></div>
+  <ul class="pts">
+    <li><b>Startup:</b> cold start (process created), warm, and hot. Users notice anything over about 1 second. Defer SDK initialization, avoid work in Application/AppDelegate, show cached content first, and use Baseline Profiles (Android).</li>
+    <li><b>Memory:</b> leaks keep screens alive. Classic causes: retain cycles in closures (iOS: capture <code>[weak self]</code>), and long-lived objects holding Activity/Context references (Android). Big bitmaps are the usual out-of-memory crash.</li>
+    <li><b>Battery and data:</b> batch network calls, avoid polling (use push), and respect low-power mode and metered networks.</li>
+    <li><b>App size</b> affects installs: strip unused resources, use app bundles/app thinning, and download big assets on demand.</li>
+  </ul>
+  <div class="widget" id="w-mb-start">
+    <div class="whead"><span class="wtitle">Animation · cutting cold-start time</span></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+  <div class="links">
+    <a class="watch" href="https://developer.android.com/topic/performance/vitals/launch-time" target="_blank" rel="noopener">Android: app startup time</a>
+    <a class="watch" href="https://developer.apple.com/documentation/xcode/reducing-your-app-s-launch-time" target="_blank" rel="noopener">Apple: reducing launch time</a>
+  </div>
+</section>
+
+<section id="mb-sec" data-deep="mb-d-sec">
+  <div><p class="eyebrow">Minutes 42–46</p><h2>Security &amp; privacy</h2></div>
+  <ul class="pts">
+    <li>Assume the device and app binary are in the attacker's hands: <b>no secrets in the app</b> (API keys can be extracted). Sensitive logic and keys stay on the server.</li>
+    <li>Sign-in: <b>OAuth 2.0 with PKCE</b> through the system browser (ASWebAuthenticationSession, Custom Tabs). Never collect third-party passwords in a web view.</li>
+    <li>Store tokens in Keychain/Keystore, use short-lived access tokens with refresh, and HTTPS only. <b>Certificate pinning</b> for high-risk apps, with a plan to rotate pins.</li>
+    <li>Privacy: request permissions in context and only when needed, keep sensitive data out of logs, crash reports and the app-switcher snapshot, and follow store privacy declarations.</li>
+  </ul>
+  <div class="widget" id="w-mb-pkce">
+    <div class="whead"><span class="wtitle">Animation · OAuth sign-in with PKCE</span></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+  <div class="links">
+    <a class="watch" href="https://mas.owasp.org/MASVS/" target="_blank" rel="noopener">OWASP MASVS</a>
+    <a class="watch" href="https://www.youtube.com/results?search_query=OAuth+PKCE+explained+mobile" target="_blank" rel="noopener">Watch: PKCE explained</a>
+  </div>
+</section>
+
+<section id="mb-release" data-deep="mb-d-release">
+  <div><p class="eyebrow">Minutes 46–51</p><h2>Testing, release &amp; monitoring</h2></div>
+  <ul class="pts">
+    <li>You can't roll back a mobile release instantly: users keep old versions for months. So release <b>gradually</b>, put risky code behind <b>remote feature flags</b>, and keep a <b>force-update</b> mechanism for emergencies.</li>
+    <li>Testing pyramid: unit tests (ViewModels, repositories), integration tests (database, networking with a mock server), and a few UI tests (Espresso/Compose test, XCUITest), plus screenshot tests for design regressions.</li>
+    <li>CI/CD: build, test, sign and upload automatically (Fastlane, Gradle Play Publisher, Xcode Cloud, Bitrise, GitHub Actions). Beta tracks: TestFlight, Play internal/closed testing.</li>
+    <li>Monitor <b>crash-free users</b> (aim for 99.5%+), ANRs/hangs, startup time and key funnels, with Crashlytics, Sentry, Play Vitals or Xcode Organizer.</li>
+  </ul>
+  <div class="widget" id="w-mb-rollout">
+    <div class="whead"><span class="wtitle">Animation · a staged rollout catching a crash</span></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+  <div class="links">
+    <a class="watch" href="https://fastlane.tools/" target="_blank" rel="noopener">Fastlane</a>
+    <a class="watch" href="https://support.google.com/googleplay/android-developer/answer/6346149" target="_blank" rel="noopener">Google Play: staged rollouts</a>
+  </div>
+</section>
+
+<section id="mb-sysd" data-deep="mb-d-case">
+  <div><p class="eyebrow">Minutes 51–60</p><h2>Mobile system design</h2></div>
+  <ul class="pts">
+    <li>"Design the Instagram feed / a chat app / an offline notes app" means designing the <b>client</b>: its architecture, data flow, caching, networking, and how it behaves on bad networks and low-end devices. Mention the backend API contract, but don't design the backend.</li>
+    <li>Structure: requirements (functional + non-functional: offline, latency, battery, device range) → <b>API contract</b> (pagination, payloads) → <b>client architecture</b> (layers, modules) → <b>data and caching</b> (DB schema, image cache) → key flows → <b>edge cases</b> (offline, process death, slow network) → monitoring.</li>
+    <li>Senior signals: pagination and prefetch, image pipeline (memory + disk cache, downsampling), optimistic updates with rollback, sync strategy, push notifications, accessibility, localization, and analytics batching.</li>
+  </ul>
+  <div class="widget">
+    <div class="whead"><span class="wtitle">Diagram · a typical client architecture</span></div>
+    <div class="chartwrap" id="dg-mb-arch"></div>
+  </div>
+  <div class="links">
+    <a class="watch" href="https://www.youtube.com/results?search_query=mobile+system+design+interview" target="_blank" rel="noopener">Watch: mobile system design interviews</a>
+    <a class="watch" href="https://github.com/weeeBox/mobile-system-design" target="_blank" rel="noopener">Mobile System Design (weeeBox, GitHub)</a>
+  </div>
+</section>
+</div><!-- /mb-crash -->
+
+<div id="mb-deep" class="panel" data-panel="deep" role="tabpanel" aria-labelledby="mb-tb-deep" hidden>
+<div class="deep"><div>
+
+<article class="topic" id="mb-d-playbook" data-t="Mobile interview playbook">
+  <p class="eyebrow">Deep dive</p><h2>Mobile interview playbook</h2>
+  <p class="lead">Mobile loops look like general SWE loops with platform depth added. Know which rounds you'll face and what each one scores.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Round</th><th>What it tests</th><th>Prepare with</th></tr></thead>
+    <tbody>
+      <tr><td>Coding (DSA)</td><td>Same as any SWE loop, often in Kotlin or Swift</td><td>The DSA subject, practised in your platform language</td></tr>
+      <tr><td>Platform knowledge</td><td>Lifecycle, threading, memory, rendering, storage, platform APIs</td><td>Crash course + iOS/Android deep dives</td></tr>
+      <tr><td>Mobile system design</td><td>Client architecture, data flow, offline, caching, performance</td><td>Mobile system design + the two case studies</td></tr>
+      <tr><td>Practical / take-home</td><td>Build a small app (list + detail from an API) with clean architecture and tests</td><td>A template project you've built before</td></tr>
+      <tr><td>Debugging / code review</td><td>Find leaks, threading bugs, lifecycle bugs in sample code</td><td>Senior Track → code review round</td></tr>
+      <tr><td>Behavioral</td><td>Same as any loop, plus app-store releases and incidents</td><td>Behavioral &amp; Leadership</td></tr>
+    </tbody></table></div>
+  <h3>The take-home checklist</h3>
+  <ul class="pts">
+    <li>Clean layers (UI / ViewModel / repository), dependency injection, and unidirectional state.</li>
+    <li>Loading, empty, error and offline states, plus pull-to-refresh and pagination.</li>
+    <li>Unit tests for ViewModel and repository; one UI test.</li>
+    <li>Accessibility (labels, dynamic type/font scale), dark mode, rotation and process death handled.</li>
+    <li>A README with decisions, trade-offs and what you'd do with more time.</li>
+  </ul>
+  <h3>Questions you'll get</h3>
+  <div class="cheat">
+    <div><strong>Lifecycle</strong><p>Rotation, process death, background limits, app states, what happens to a running request when the screen closes.</p></div>
+    <div><strong>Threading</strong><p>Main thread rules, coroutines vs threads, async/await and actors, race conditions in UI state.</p></div>
+    <div><strong>Memory</strong><p>Retain cycles, leaks, bitmaps and OOM, weak vs unowned, Context leaks.</p></div>
+    <div><strong>UI</strong><p>Compose recomposition, SwiftUI view identity, list performance, custom layouts, animations.</p></div>
+    <div><strong>Data</strong><p>Offline-first, caching policies, Room/Core Data, pagination, conflict resolution.</p></div>
+    <div><strong>Release</strong><p>Staged rollout, feature flags, force update, crash triage, store review.</p></div>
+  </div>
+  <div class="links"><a class="watch" href="https://github.com/weeeBox/mobile-system-design" target="_blank" rel="noopener">Mobile System Design guide</a><a class="watch" href="https://www.youtube.com/results?search_query=android+developer+interview+questions+senior" target="_blank" rel="noopener">Watch: Android interview questions</a><a class="watch" href="https://www.youtube.com/results?search_query=iOS+developer+interview+questions+senior" target="_blank" rel="noopener">Watch: iOS interview questions</a></div>
+</article>
+
+<article class="topic" id="mb-d-ios" data-t="iOS &amp; Swift in depth">
+  <p class="eyebrow">Deep dive</p><h2>iOS &amp; Swift in depth</h2>
+  <h3>Swift essentials</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Concept</th><th>What to say</th></tr></thead>
+    <tbody>
+      <tr><td>Value vs reference types</td><td>Structs and enums are copied (copy-on-write for collections); classes are shared references. Prefer structs for models: safer with concurrency, no shared mutation.</td></tr>
+      <tr><td>Optionals</td><td><code>?</code>, <code>if let</code>/<code>guard let</code>, <code>??</code>. Avoid force-unwrapping (<code>!</code>) outside of truly impossible cases.</td></tr>
+      <tr><td>ARC</td><td>Automatic reference counting frees objects when no strong references remain. Cycles (A → B → A) leak; break them with <code>weak</code> (optional, becomes nil) or <code>unowned</code> (non-optional, must outlive).</td></tr>
+      <tr><td>Protocols &amp; generics</td><td>Protocol-oriented design, extensions with default implementations, <code>some</code> (opaque) vs <code>any</code> (existential) types.</td></tr>
+      <tr><td>Error handling</td><td><code>throws</code>/<code>try</code>/<code>do-catch</code>, <code>Result</code>, typed throws in newer Swift.</td></tr>
+    </tbody></table></div>
+<pre><code>final class ImageLoader {
+    var onFinish: (() -&gt; Void)?
+    func start() {
+        api.fetch { [weak self] data in          // without [weak self]: loader → closure → loader = leak
+            guard let self else { return }
+            self.cache(data)
+            self.onFinish?()
+        }
+    }
+}</code></pre>
+  <h3>SwiftUI vs UIKit</h3>
+  <ul class="pts">
+    <li><b>SwiftUI:</b> declarative, state-driven (<code>@State</code>, <code>@Binding</code>, <code>@Observable</code>/<code>ObservableObject</code>, <code>@Environment</code>). A view's body is re-evaluated when its inputs change, so keep it cheap. <b>Identity</b> (structural position or <code>.id</code>) decides whether state is kept or reset.</li>
+    <li><b>UIKit:</b> imperative, mature, fine-grained control. Still common for complex screens, and the two interoperate (<code>UIHostingController</code>, <code>UIViewRepresentable</code>).</li>
+  </ul>
+  <h3>Concurrency</h3>
+  <ul class="pts">
+    <li><b>GCD:</b> <code>DispatchQueue.main.async</code> for UI, background queues for work. <b>OperationQueue</b> adds dependencies and cancellation.</li>
+    <li><b>async/await</b>, <code>Task</code>, <code>TaskGroup</code> for structured parallelism, <b>actors</b> to serialize access to mutable state, and <code>@MainActor</code> for UI. Swift 6's strict concurrency checking catches data races at compile time.</li>
+    <li>A <b>main-thread hang</b> on iOS (the watchdog kills apps that block too long at launch) is a classic interview topic.</li>
+  </ul>
+  <div class="links"><a class="watch" href="https://docs.swift.org/swift-book/" target="_blank" rel="noopener">The Swift Programming Language</a><a class="watch" href="https://www.hackingwithswift.com/" target="_blank" rel="noopener">Hacking with Swift</a></div>
+</article>
+
+<article class="topic" id="mb-d-android" data-t="Android &amp; Kotlin in depth">
+  <p class="eyebrow">Deep dive</p><h2>Android &amp; Kotlin in depth</h2>
+  <h3>Kotlin essentials</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Concept</th><th>What to say</th></tr></thead>
+    <tbody>
+      <tr><td>Null safety</td><td><code>String?</code>, <code>?.</code>, <code>?:</code>, avoid <code>!!</code>. Platform types from Java need care.</td></tr>
+      <tr><td>Data classes &amp; sealed types</td><td>Immutable models with <code>copy()</code>; sealed classes/interfaces for exhaustive UI states (<code>Loading</code>, <code>Content</code>, <code>Error</code>).</td></tr>
+      <tr><td>Coroutines &amp; Flow</td><td>Suspend functions, scopes, dispatchers, structured concurrency. <code>StateFlow</code> for state, <code>SharedFlow</code> for one-off events, cold <code>Flow</code> for streams.</td></tr>
+      <tr><td>Extension functions, scope functions</td><td><code>let</code>, <code>apply</code>, <code>run</code>, <code>also</code>, <code>with</code>: know when each reads best.</td></tr>
+    </tbody></table></div>
+  <h3>Lifecycle &amp; process death</h3>
+  <ul class="pts">
+    <li>Configuration changes recreate the Activity. <b>ViewModel</b> survives them, but not process death. <b>SavedStateHandle</b> and <code>rememberSaveable</code> survive process death (small data only).</li>
+    <li>Collect flows lifecycle-aware: <code>repeatOnLifecycle(STARTED)</code> or <code>collectAsStateWithLifecycle()</code>, so you stop work when the UI isn't visible.</li>
+    <li>Test it: "Don't keep activities" in developer options, or <code>adb shell am kill</code> while in the background.</li>
+  </ul>
+  <h3>Jetpack Compose</h3>
+  <ul class="pts">
+    <li>Composables re-run (<b>recompose</b>) when the state they read changes. Keep parameters <b>stable</b> (immutable data, stable lambdas) so Compose can skip unchanged parts.</li>
+    <li><code>remember</code> caches across recompositions, <code>derivedStateOf</code> limits recomposition to real changes, and <code>LaunchedEffect</code>/<code>DisposableEffect</code> handle side effects tied to the composition.</li>
+    <li><b>State hoisting:</b> stateless composables receive state and emit events, which makes them reusable and testable.</li>
+  </ul>
+<pre><code>@Composable
+fun FeedScreen(vm: FeedViewModel = hiltViewModel()) {
+    val state by vm.state.collectAsStateWithLifecycle()        // stops collecting in the background
+    when {
+        state.loading &amp;&amp; state.posts.isEmpty() -&gt; LoadingView()
+        state.error != null &amp;&amp; state.posts.isEmpty() -&gt; ErrorView(state.error!!, onRetry = vm::refresh)
+        else -&gt; FeedList(state.posts, onLike = vm::onLike)        // stateless child: state down, events up
+    }
+}</code></pre>
+  <h3>Background work</h3>
+  <p><b>WorkManager</b> for deferrable, guaranteed work (sync, uploads) with constraints and backoff. Foreground services only for user-visible ongoing work (navigation, playback). Android restricts background execution more with each version, so explain why your choice is allowed.</p>
+  <div class="links"><a class="watch" href="https://developer.android.com/develop/ui/compose/mental-model" target="_blank" rel="noopener">Thinking in Compose</a><a class="watch" href="https://kotlinlang.org/docs/flow.html" target="_blank" rel="noopener">Kotlin Flow</a></div>
+</article>
+
+<article class="topic" id="mb-d-cross" data-t="Cross-platform">
+  <p class="eyebrow">Deep dive</p><h2>Cross-platform: React Native, Flutter, KMP</h2>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th>React Native</th><th>Flutter</th><th>Kotlin Multiplatform</th></tr></thead>
+    <tbody>
+      <tr><td>Language</td><td>JavaScript / TypeScript</td><td>Dart</td><td>Kotlin</td></tr>
+      <tr><td>UI</td><td>Native platform views</td><td>Its own rendering engine (draws every pixel)</td><td>Native UI per platform, or Compose Multiplatform</td></tr>
+      <tr><td>Shares</td><td>UI + logic</td><td>UI + logic</td><td>Logic (networking, data, domain), optionally UI</td></tr>
+      <tr><td>Strengths</td><td>Web team skills, large ecosystem, over-the-air JS updates</td><td>Consistent pixel-perfect UI, fast development, good performance</td><td>Fully native feel and performance, gradual adoption in existing apps</td></tr>
+      <tr><td>Watch out for</td><td>Native bridging and module upkeep (the new architecture with JSI/Fabric reduces bridge cost)</td><td>Platform look-and-feel, plugin quality for niche native APIs</td><td>Two UI codebases (unless using Compose Multiplatform), iOS tooling maturity</td></tr>
+    </tbody></table></div>
+  <h3>How to answer "native or cross-platform?"</h3>
+  <ul class="pts">
+    <li>Depends on team skills, how platform-specific the UX is (camera, AR, widgets, heavy animation), performance needs, and existing code.</li>
+    <li>A strong answer names the trade-off: "For a content and commerce app with a small team, I'd pick Flutter or React Native. For a camera-heavy app with deep OS integration, native, possibly sharing business logic with KMP."</li>
+  </ul>
+</article>
+
+<article class="topic" id="mb-d-arch" data-t="Architecture in depth">
+  <p class="eyebrow">Deep dive</p><h2>Architecture, modularization &amp; DI</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Pattern</th><th>Idea</th><th>Watch out for</th></tr></thead>
+    <tbody>
+      <tr><td>MVC (classic iOS)</td><td>Controller wires model and view</td><td>"Massive view controller"</td></tr>
+      <tr><td>MVVM</td><td>ViewModel exposes state; the view binds to it</td><td>Too many mutable streams; prefer one state object</td></tr>
+      <tr><td>MVI / Redux-style</td><td>Intents → reducer → single immutable state</td><td>Boilerplate; keep reducers pure</td></tr>
+      <tr><td>Clean architecture</td><td>UI → domain (use cases) → data, dependencies point inward</td><td>Over-engineering small apps</td></tr>
+      <tr><td>VIPER / TCA (iOS)</td><td>Strict separation / composable reducers</td><td>Learning curve, ceremony</td></tr>
+    </tbody></table></div>
+  <h3>Modularization</h3>
+  <ul class="pts">
+    <li>Split by <b>feature</b> (feed, profile, checkout) plus shared core modules (network, design system, analytics). Faster builds, clear ownership, enforced boundaries.</li>
+    <li>Features depend on core and on <b>interfaces</b> of other features, never on their implementations. Navigation goes through a router or deep-link layer.</li>
+  </ul>
+  <h3>Dependency injection</h3>
+  <ul class="pts">
+    <li>Android: <b>Hilt</b> (Dagger, compile-time) or Koin (runtime). iOS: initializer injection, environment values, or a lightweight container.</li>
+    <li>The point is testability and swapping implementations (fake repository in tests, mock server in debug builds).</li>
+  </ul>
+  <h3>Navigation &amp; deep links</h3>
+  <p>Model navigation as state (a back stack) where possible. Every important screen should be reachable from a deep link, with arguments validated, because links come from push notifications, emails and the web.</p>
+</article>
+
+<article class="topic" id="mb-d-offline" data-t="Offline &amp; data in depth">
+  <p class="eyebrow">Deep dive</p><h2>Offline-first, caching &amp; sync in depth</h2>
+  <h3>Read strategies</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Strategy</th><th>Behaviour</th><th>Use for</th></tr></thead>
+    <tbody>
+      <tr><td>Cache-first, then network</td><td>Show local data immediately, refresh in the background, update the DB, and the UI updates automatically</td><td>Feeds, profiles, most screens</td></tr>
+      <tr><td>Network-first, cache fallback</td><td>Try the network, fall back to cache on failure</td><td>Data that must be fresh (balances, prices)</td></tr>
+      <tr><td>Cache-only with background sync</td><td>Full local dataset, synced periodically</td><td>Notes, email, field-work apps</td></tr>
+    </tbody></table></div>
+  <h3>Writes: the outbox pattern</h3>
+<pre><code>// Room entity for queued actions; WorkManager drains it when the network is back
+@Entity data class PendingAction(
+    @PrimaryKey val id: String = UUID.randomUUID().toString(),   // idempotency key sent to the server
+    val type: String, val payload: String, val createdAt: Long, val attempts: Int = 0)
+
+class SyncWorker(ctx: Context, p: WorkerParameters) : CoroutineWorker(ctx, p) {
+    override suspend fun doWork(): Result {
+        for (a in dao.pendingInOrder()) {
+            when (api.send(a)) {                      // server dedupes on a.id
+                Ok -&gt; dao.delete(a)
+                Conflict -&gt; resolveConflict(a)        // e.g. server wins, then refresh local copy
+                Retryable -&gt; return Result.retry()    // WorkManager applies exponential backoff
+            }
+        }
+        return Result.success()
+    }
+}</code></pre>
+  <h3>Conflict resolution</h3>
+  <ul class="pts">
+    <li><b>Server wins</b> (simple, may lose local edits), <b>last write wins</b> by version or timestamp, <b>field-level merge</b>, or <b>ask the user</b> for important content.</li>
+    <li>Send the version (ETag/revision) you edited from; the server rejects stale updates with 409 so the client can merge.</li>
+    <li>For collaborative data, CRDTs handle merges automatically (see Distributed Systems → Replication).</li>
+  </ul>
+  <h3>Pagination &amp; images</h3>
+  <ul class="pts">
+    <li>Cursor-based pagination, stored in the DB (Paging 3 with RemoteMediator on Android) so scroll position survives process death.</li>
+    <li>Image pipeline: memory LRU cache → disk cache → network, with <b>downsampling</b> to the display size, request de-duplication, cancellation for reused cells, and prefetching. Libraries: Coil/Glide (Android), Kingfisher/Nuke (iOS).</li>
+  </ul>
+</article>
+
+<article class="topic" id="mb-d-perf" data-t="Performance in depth">
+  <p class="eyebrow">Deep dive</p><h2>Performance in depth</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Area</th><th>Measure with</th><th>Typical fixes</th></tr></thead>
+    <tbody>
+      <tr><td>Startup</td><td>Macrobenchmark, Play Vitals, App Startup tracing; Instruments App Launch, MetricKit</td><td>Lazy SDK init, Baseline Profiles, fewer dynamic frameworks, cached first screen</td></tr>
+      <tr><td>Rendering / jank</td><td>JankStats, Perfetto, Layout Inspector; Instruments Hitches, Time Profiler</td><td>Off-main-thread work, flatter layouts, stable Compose params, cheaper SwiftUI bodies</td></tr>
+      <tr><td>Memory</td><td>Memory Profiler, LeakCanary; Instruments Leaks/Allocations, Memory Graph</td><td>Break retain cycles, avoid Context leaks, downsample bitmaps, bounded caches</td></tr>
+      <tr><td>Network</td><td>Network Inspector, Charles/Proxyman</td><td>Batching, compression, HTTP caching, smaller payloads, fewer round trips</td></tr>
+      <tr><td>Battery</td><td>Battery Historian, Energy Log</td><td>No polling, batch work, respect Doze/low-power mode, efficient location use</td></tr>
+      <tr><td>Size</td><td>APK Analyzer, App Store size report</td><td>R8/ProGuard shrinking, asset compression, on-demand resources</td></tr>
+    </tbody></table></div>
+  <h3>ANRs and hangs</h3>
+  <p>Android shows "App Not Responding" when the main thread is blocked for about 5 seconds during input. iOS reports hangs and the launch watchdog terminates apps that block too long at startup. Both mean main-thread work that belongs elsewhere: disk, network, locks, or heavy computation.</p>
+</article>
+
+<article class="topic" id="mb-d-sec" data-t="Mobile security in depth">
+  <p class="eyebrow">Deep dive</p><h2>Mobile security in depth</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Risk</th><th>Defense</th></tr></thead>
+    <tbody>
+      <tr><td>Secrets in the binary</td><td>None: anything shipped can be extracted. Use server-side keys, short-lived tokens, and app attestation (App Attest, Play Integrity) to limit abuse.</td></tr>
+      <tr><td>Insecure token storage</td><td>Keychain (with appropriate accessibility class) / Android Keystore-backed EncryptedFile or DataStore.</td></tr>
+      <tr><td>Man-in-the-middle</td><td>HTTPS everywhere (ATS, network security config), optional certificate/public-key pinning with backup pins.</td></tr>
+      <tr><td>Insecure auth flows</td><td>OAuth 2.0 + PKCE via system browser, no embedded web-view logins, biometric unlock bound to Keystore/Keychain keys.</td></tr>
+      <tr><td>Data leakage</td><td>No PII in logs or crash reports, blur the app-switcher snapshot for sensitive screens, exclude secrets from backups.</td></tr>
+      <tr><td>Tampering / reverse engineering</td><td>Obfuscation (R8), integrity checks, jailbreak/root signals as risk input (not absolute protection).</td></tr>
+      <tr><td>Deep-link abuse</td><td>Validate every parameter; verified App Links / Universal Links so other apps can't intercept.</td></tr>
+    </tbody></table></div>
+  <div class="links"><a class="watch" href="https://mas.owasp.org/" target="_blank" rel="noopener">OWASP Mobile Application Security</a></div>
+</article>
+
+<article class="topic" id="mb-d-release" data-t="Release engineering">
+  <p class="eyebrow">Deep dive</p><h2>Release engineering &amp; app health</h2>
+  <ul class="pts">
+    <li><b>Release train:</b> a fixed cadence (weekly or every two weeks) with a branch cut, QA/beta period, then staged rollout. Predictable for the whole company.</li>
+    <li><b>Staged rollout:</b> 1% → 5% → 20% → 50% → 100%, gated on crash-free rate, ANRs/hangs and key business metrics. Halt and fix forward, because you can't pull a version off devices.</li>
+    <li><b>Feature flags and remote config:</b> ship code dark, enable per cohort, kill switch for incidents, and experiments (A/B).</li>
+    <li><b>Force / soft update:</b> a minimum-supported-version check at startup, for security fixes or breaking API changes.</li>
+    <li><b>Backward compatibility:</b> the API must support every app version still in use. Version the API and track usage by app version.</li>
+    <li><b>Observability:</b> crash reporting with symbolication (dSYMs, R8 mapping files), structured analytics batched and sent efficiently, and performance monitoring from real devices.</li>
+  </ul>
+<pre><code># Fastfile: build, test and ship a beta on every merge to main
+lane :beta do
+  run_tests(scheme: "App")
+  build_app(scheme: "App", export_method: "app-store")
+  upload_to_testflight(skip_waiting_for_build_processing: true)
+end</code></pre>
+</article>
+
+<article class="topic" id="mb-d-case" data-t="Case study: feed client">
+  <p class="eyebrow">Deep dive</p><h2>Case study: design an Instagram-style feed client</h2>
+  <p class="lead">"Design the mobile client for an image feed: infinite scroll, likes, comments, works on bad networks."</p>
+  <h3>Requirements</h3>
+  <ul class="pts">
+    <li><b>Functional:</b> scrolling feed of posts (image, caption, author, like count), like/unlike, open comments, pull-to-refresh.</li>
+    <li><b>Non-functional:</b> first content in under 1 s on launch (from cache), smooth scrolling at 60 fps on mid-range devices, works offline with cached feed, efficient data and battery use.</li>
+  </ul>
+  <h3>API contract</h3>
+<pre class="plain"><code>GET  /v1/feed?cursor=abc&amp;limit=20   → { posts: [ {id, author:{id,name,avatar_url}, image:{url, width, height, blurhash},
+                                                caption, like_count, liked_by_me, created_at} ], next_cursor }
+POST /v1/posts/{id}/like            (idempotent; header Idempotency-Key)
+DELETE /v1/posts/{id}/like</code></pre>
+  <h3>Client architecture</h3>
+  <div class="widget"><div class="whead"><span class="wtitle">Diagram · feed client</span></div><div class="chartwrap" id="dg-mb-feed"></div></div>
+  <h3>Key decisions</h3>
+  <ul class="pts">
+    <li><b>Local DB as source of truth:</b> the feed screen observes a DB query. The network layer writes pages into the DB (Paging 3 + RemoteMediator, or an equivalent on iOS). Launch shows cached posts instantly.</li>
+    <li><b>Pagination:</b> cursor-based, prefetch when 5 items from the end, store the cursor with the page so it survives process death.</li>
+    <li><b>Images:</b> the server sends dimensions and a tiny placeholder (blurhash) so layout doesn't jump. Load images downsampled to the cell size, with memory + disk LRU caches, cancel on cell reuse, and prefetch the next rows.</li>
+    <li><b>Likes:</b> optimistic update in the DB, queued in an outbox with an idempotency key, rolled back with a message if it ultimately fails.</li>
+    <li><b>Freshness:</b> pull-to-refresh, a "new posts" pill instead of jumping the list, and silent push to warm the cache.</li>
+    <li><b>Low-end devices and bad networks:</b> smaller image variants on slow connections, limit concurrent downloads, respect data saver.</li>
+    <li><b>Monitoring:</b> time to first content, scroll jank rate, image load failures, crash-free sessions, analytics batched per session.</li>
+  </ul>
+  <h3>Senior follow-ups</h3>
+</article>
+
+<article class="topic" id="mb-d-chat" data-t="Case study: chat client">
+  <p class="eyebrow">Deep dive</p><h2>Case study: design a chat app client</h2>
+  <p class="lead">"Design the client for a 1:1 and group messaging app with delivery states, offline sending and push notifications."</p>
+  <h3>Message states</h3>
+<pre class="plain"><code>composing → queued (local only, client_id) → sending → sent (server id assigned)
+          → delivered (recipient device got it) → read (recipient opened)
+          ↘ failed (retry with backoff; user can tap to resend)</code></pre>
+  <h3>Client architecture</h3>
+  <div class="widget"><div class="whead"><span class="wtitle">Diagram · chat client</span></div><div class="chartwrap" id="dg-mb-chat"></div></div>
+  <h3>Key decisions</h3>
+  <ul class="pts">
+    <li><b>Transport:</b> a WebSocket (or MQTT) connection while the app is in the foreground; <b>push notifications</b> (APNs/FCM) wake the app or show a notification when it isn't. Reconnect with backoff and jitter, and resync missed messages using the last known sequence number.</li>
+    <li><b>Local DB first:</b> every message (incoming or outgoing) is written to the DB, and the conversation screen observes it. Sending is just inserting a queued message; a sender service drains the queue.</li>
+    <li><b>Ordering and de-duplication:</b> the client generates a <code>client_id</code> for each message; the server assigns a per-conversation sequence number. Sort by sequence, and de-duplicate on <code>client_id</code> when the server echoes a message back.</li>
+    <li><b>History:</b> paginate older messages backwards with a cursor; keep the newest window in the DB for instant open.</li>
+    <li><b>Media:</b> upload separately (resumable, with progress) and send a message referencing the uploaded URL; generate thumbnails locally.</li>
+    <li><b>Notifications:</b> a notification service extension (iOS) or FCM data message (Android) can decrypt and show the sender's name, and update the badge count.</li>
+    <li><b>Security:</b> end-to-end encryption (Signal protocol) means keys live on the device: discuss key storage in Keychain/Keystore and multi-device key sync as trade-offs.</li>
+  </ul>
+  <h3>Senior follow-ups</h3>
+</article>
+
+</div></div>
+</div><!-- /mb-deep -->
+</div><!-- /s-mb -->
+
 <!-- BEHAVIORAL & LEADERSHIP                                -->
 <!-- ===================================================== -->
 <div class="subject" id="s-bl" data-s="bl" data-name="Behavioral &amp; Leadership" hidden>
@@ -8678,6 +9251,141 @@ const BL_IQ={
 };
 Object.assign(IQ,BL_IQ);
 
+// =================== MOBILE ENGINEERING ===================
+// lifecycle
+let lifeMode='android';
+const LIFE={android:{states:['Created','Started','Resumed','Paused','Stopped','Destroyed'],steps:[
+  ['Created','onCreate()','App launched. The Activity is created: inflate UI, get the ViewModel, set up observers.',1],
+  ['Started','onStart()','Becoming visible.',1],['Resumed','onResume()','In the foreground and interactive. This is where the user spends their time.',1],
+  ['Paused','onPause()','User pressed Home. Losing focus first: pause animations, sensors, the camera.',1],
+  ['Stopped','onStop()','No longer visible. Stop UI updates and save drafts. The process may now be killed at any time.',1],
+  ['Resumed','onRestart() → onStart() → onResume()','User came back. Same instance, so state is still in memory.',1],
+  ['Destroyed','rotation: onPause → onStop → onDestroy','<b>Configuration change</b> (rotation, dark mode, language). The Activity is destroyed and recreated…',1],
+  ['Resumed','onCreate → onStart → onResume','…and the new Activity re-attaches to the <b>same ViewModel</b>, so no data is lost and no network call is repeated.',1],
+  ['Stopped','backgrounded, then process killed','The user switches apps for an hour and the system <b>kills the process</b> to free memory. The ViewModel is gone.',0],
+  ['Created','new process: onCreate(savedState)','On return, Android recreates the back stack. Only <b>SavedStateHandle / rememberSaveable</b> data survives. Re-load the rest from the DB. If you skipped this, the user loses their form.',0]]},
+ ios:{states:['Not running','Inactive','Active','Background','Suspended'],steps:[
+  ['Inactive','launch: scene becomes foreground','App launched. The scene is connected and moving to the foreground.',1],
+  ['Active','scenePhase = .active','Interactive. Receiving events.',1],
+  ['Inactive','incoming call / Control Center','Temporarily interrupted, still visible. Pause timers and games.',1],
+  ['Background','scenePhase = .background','User went Home. You get a short window: save state, finish small tasks (or request background time).',1],
+  ['Suspended','suspended by the system','Frozen in memory, with no code running. Nothing to do here, and no notification of it.',1],
+  ['Active','returns to foreground','Resumed instantly from memory. All state intact.',1],
+  ['Not running','terminated under memory pressure','While suspended, iOS terminates the app to reclaim memory. <b>No callback</b> runs.',0],
+  ['Active','relaunch + state restoration','The user taps the app icon. Without saved state they start from scratch, so persist drafts on .background and restore them on launch.',0]]}};
+const lifeP=player('w-mb-life',()=>LIFE[lifeMode].steps.map((s,i)=>({i,msg:'<code>'+s[1]+'</code>: '+s[2]})),
+ f=>{const L=LIFE[lifeMode],s=L.steps[f.i];return '<div class="state">'+L.states.map(st=>'<span class="ph '+(st===s[0]?'refactor':'')+'">'+st+'</span>').join('')+'</div>'+
+   '<div class="lines">'+L.steps.slice(Math.max(0,f.i-3),f.i+1).map((x,j,a)=>'<div class="line'+(j===a.length-1?' cur':'')+'"><span class="tag info">'+x[0]+'</span><span class="txt" style="font-family:var(--f-mono);font-size:.8rem">'+x[1]+'</span></div>').join('')+'</div>'+
+   '<div class="kvs"><span class="kv'+(s[3]?' hit':'')+'"'+(s[3]?'':' style="border-color:var(--bad);background:var(--bad-soft)"')+'>'+(lifeMode==='android'?'ViewModel (in memory): '+(s[3]?'alive':'gone'):'in-memory state: '+(s[3]?'alive':'gone'))+'</span><span class="kv hit">'+(lifeMode==='android'?'SavedStateHandle / DB: kept':'persisted drafts / DB: kept')+'</span></div>';});
+modeSwitch('life-mode',m=>{lifeMode=m;lifeP.rebuild();});
+
+// frame budget
+const FRM=[[6,'normal frame'],[7,''],[5,''],[9,''],[22,'decoding a large image on the main thread'],[7,''],[6,''],[38,'synchronous database read in bind()'],[8,''],[6,''],[7,''],[6,'']];
+player('w-mb-frame',()=>[{k:0,msg:`Each bar is one frame of main-thread work. The line is the 16.7 ms budget at 60 Hz.`},...FRM.map((fr,i)=>({k:i+1,msg:fr[0]>16.7?'Frame '+(i+1)+': <b>'+fr[0]+' ms</b>: '+fr[1]+'. That misses '+(Math.ceil(fr[0]/16.7)-1)+' frame'+(Math.ceil(fr[0]/16.7)-1>1?'s':'')+', so the scroll visibly stutters.':'Frame '+(i+1)+': '+fr[0]+' ms. Within budget.'})),
+  {k:FRM.length,msg:`2 slow frames out of 12 dropped 3 frames. Fix: decode and downsample images on a background thread (image libraries do this), and move DB reads out of bind (observe a query in the ViewModel instead). At 120 Hz the budget is only 8.3 ms.`}],
+ f=>{const W=560,H=170,B=16.7,Y=v=>H-24-Math.min(v,42)/42*(H-40);let s='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" style="max-width:100%;height:auto" role="img" aria-label="frame times">';
+   s+='<line x1="30" x2="'+(W-10)+'" y1="'+Y(B)+'" y2="'+Y(B)+'" style="stroke:var(--accent);stroke-dasharray:5 4;stroke-width:2"/><text class="tick" x="'+(W-10)+'" y="'+(Y(B)-6)+'" text-anchor="end">16.7 ms budget</text>';
+   FRM.slice(0,f.k).forEach((fr,i)=>{const x=36+i*43,y=Y(fr[0]),over=fr[0]>B;s+='<rect x="'+x+'" y="'+y+'" width="30" height="'+(H-24-y)+'" rx="3" style="fill:var('+(over?'--bad':'--ok')+')"/><text class="tick" x="'+(x+15)+'" y="'+(y-4)+'" text-anchor="middle">'+fr[0]+'</text>';});
+   return s+'<text class="tick" x="30" y="'+(H-6)+'">frames →</text></svg>';});
+
+// view recycling
+player('w-mb-recycle',()=>{const F=[{top:0,pool:[],msg:'The screen fits 6 rows. The list creates 7 views (one spare), not 1,000.'}];
+  [1,2,3,4,5].forEach(t=>F.push({top:t,rec:'V'+(((t-1)%7)+1),msg:'Scrolled one row: <b>V'+(((t-1)%7)+1)+'</b> left the top, went to the recycle pool, and was <b>re-bound</b> to item '+(t+6)+' at the bottom. Binding just sets new text and an image request. Nothing is inflated.'}));
+  F.push({top:5,msg:'Scrolling through all 1,000 items still uses the same 7 views, so memory stays flat and binding is fast. A slow bind (I/O, heavy layout) shows up as jank on every row.'});return F;},
+ f=>{const rows=[];for(let i=0;i<7;i++){const item=f.top+i,v='V'+((item%7)+1);rows.push([v,item]);}
+   return '<div class="row" style="align-items:flex-start"><div class="lines" style="max-width:360px">'+rows.map(([v,it],i)=>'<div class="line'+(f.rec===v&&i===6?' cur':'')+'" style="'+(i===6?'opacity:.55':'')+'"><span class="tag info">'+v+'</span><span class="txt">item '+it+(i===6?' (spare, just off screen)':'')+'</span></div>').join('')+'</div>'+
+    '<div class="dcard" style="max-width:220px"><h4>Views created</h4><div class="timer" style="font-size:2rem">7</div><div class="note">items in the list: 1,000</div></div></div>';});
+
+// unidirectional data flow
+linePlayer('w-mb-udf',`State flows down, events flow up. The UI never changes data directly.`,[
+ ['UI → event',`User taps ♥ on post 42. The UI calls <code>viewModel.onLike("42")</code>.`,`The UI only sends an <b>event</b>. It doesn't change anything itself.`],
+ ['ViewModel',`Updates state optimistically: <code>post 42: liked = true, likes = 128</code>.`,`<b>Optimistic update</b>: the heart fills instantly, before the network call.`],
+ ['State → UI',`The new immutable <code>FeedState</code> is emitted, and only the changed row recomposes / re-renders.`,`One source of truth, rendered by the UI.`],
+ ['Repository',`<code>repo.like("42")</code> writes to the local DB and queues the API call with an idempotency key.`,`The repository decides local vs network. The ViewModel doesn't know about HTTP.`],
+ ['Failure',`The API returns an error (offline for too long, or the post was deleted).`,`Something went wrong.`],
+ ['Rollback',`The ViewModel reverts: <code>liked = false, likes = 127</code>, and emits a one-off "Couldn't like" message.`,`<b>Roll back</b> the optimistic change and tell the user. The UI stays consistent with the server.`]]);
+
+// concurrency lanes
+const CC=[[['tap → viewModelScope.launch',''],'Main: user taps "Load profile". A coroutine starts on the main thread.'],[['suspend…','withContext(IO) → HTTP + JSON parse'],'Heavy work moves to the <b>IO dispatcher</b>. The main thread is <b>free</b>: scrolling and animations stay smooth.'],
+ [['renders a spinner, scrolls at 60 fps','…still downloading'],'Both run in parallel. Blocking the main thread here would freeze the UI (and trigger an ANR after about 5 s).'],[['state = Loaded(profile)','done'],'The result returns to Main and updates the state. The UI recomposes.'],
+ [['user presses Back → scope cancelled','request cancelled ✕'],'Second scenario: the user leaves mid-request. <b>viewModelScope</b> is cancelled, which cancels the child request. No leak, and no crash from updating a dead screen.']];
+player('w-mb-conc',()=>CC.map((c,i)=>({i,msg:c[1]})),
+ f=>'<div class="lanes"><div class="lane on" style="min-width:12rem">Main thread<small>'+CC[f.i][0][0]+'</small></div><span class="lk on">⇄</span><div class="lane'+(CC[f.i][0][1]?(CC[f.i][0][1].includes('✕')?' bad':' on'):' dimmed')+'" style="min-width:12rem">Background (IO)<small>'+(CC[f.i][0][1]||'idle')+'</small></div></div>');
+
+// offline outbox
+const OX=[[1,[],['post 42 ♥'],'online','Online. The feed is cached in the local DB, which the UI observes.'],
+ [0,['like post 42'],['post 42 ♥ (local)'],'offline','The network drops (subway). The user likes post 42: the DB updates at once (UI shows ♥) and the action is added to the <b>outbox</b> with an idempotency key.'],
+ [0,['like post 42','comment on 17','edit caption on 9'],['post 42 ♥','comment on 17 (pending)','caption 9 edited'],'offline','More actions queue up. The app feels fully functional offline.'],
+ [1,['comment on 17','edit caption on 9'],['post 42 ♥ ✓'],'syncing','Back online. A WorkManager / BGTask job drains the outbox <b>in order</b>. The like is accepted (the server de-dupes retries on the key).'],
+ [1,['edit caption on 9'],['comment on 17 ✓'],'syncing','The comment is accepted.'],
+ [1,[],['caption 9: conflict → server version kept, your draft saved'],'online','The caption edit hits a <b>conflict</b> (409: someone else edited it first). The policy here is server wins, and the user\'s text is kept as a draft so nothing is lost.']];
+player('w-mb-offline',()=>OX.map(o=>({on:o[0],q:o[1],db:o[2],net:o[3],msg:o[4]})),
+ f=>'<div class="kvs"><span class="kv'+(f.on?' hit':'')+'"'+(f.on?'':' style="border-color:var(--bad);background:var(--bad-soft)"')+'>network: '+f.net+'</span></div><div class="row" style="align-items:stretch;width:100%">'+
+  '<div class="thr on"><b>Local DB (UI reads this)</b>'+f.db.map(d=>'<span class="pod">'+d+'</span>').join('')+'</div>'+
+  '<div class="thr'+(f.q.length?' on':'')+'"><b>Outbox</b>'+(f.q.length?f.q.map(d=>'<span class="pod v2">'+d+'</span>').join(''):'<span class="empty">empty</span>')+'</div>'+
+  '<div class="thr'+(f.on?'':' wait')+'"><b>Server</b><span class="st">'+(f.on?'reachable':'unreachable')+'</span></div></div>');
+
+// storage decision
+const ST=[[`Auth refresh token`,'Keychain / Keystore',`A secret: needs hardware-backed encryption. Never UserDefaults or SharedPreferences.`],
+ [`Dark-mode preference`,'UserDefaults / DataStore',`A small key-value setting. DataStore is async and safe on Android.`],
+ [`10,000 cached posts, queried and observed by the UI`,'SQLite: Room / SwiftData / Core Data',`Structured, queryable, observable. It's the offline source of truth.`],
+ [`Downloaded videos (2 GB)`,'Files + your own eviction',`Large blobs go in files, not the database. Use the cache dir if re-downloadable, and cap the size with LRU eviction.`]];
+player('w-mb-store',()=>[{k:0,msg:`Four kinds of data. Pick the right store for each.`},...ST.map((x,i)=>({k:i+1,msg:'<b>'+x[1]+'</b>: '+x[2]}))],
+ f=>'<div class="dash">'+ST.map((x,i)=>'<div class="dcard"'+(i===f.k-1?' style="border-color:var(--hl)"':'')+'><p style="margin:0">'+x[0]+'</p>'+(i<f.k?'<span class="tag good" style="align-self:flex-start">'+x[1]+'</span>':'<span class="tag info" style="align-self:flex-start">?</span>')+'</div>').join('')+'</div>');
+
+// cold start
+const CS1=[['Process + runtime',150,'--dim'],['App init: 9 SDKs',900,'--bad'],['First screen inflate',350,'--c4'],['Blocking feed request',1200,'--bad'],['Render',100,'--ok']];
+const CS2=[['Process',150,'--dim'],['App init (2 critical SDKs)',180,'--c2'],['First screen',220,'--c4'],['Cached feed from DB',120,'--ok'],['Render',80,'--ok']];
+player('w-mb-start',()=>[{v:1,k:0,msg:`Cold start: from tap to useful content. Users start abandoning beyond about 2 seconds.`},...CS1.map((c,i)=>({v:1,k:i+1,msg:'<b>'+c[0]+'</b>: '+c[1]+' ms'+(c[2]==='--bad'?'. This is the problem.':'.')})),
+  {v:1,k:5,msg:`<b>2.7 s</b> before the user sees anything useful. The main culprits: initializing every SDK at launch, and waiting on the network.`},
+  {v:2,k:5,msg:`After: initialize only critical SDKs at launch (the rest lazily or after the first frame), show the <b>cached feed from the DB</b> immediately and refresh in the background, and add Baseline Profiles (Android) for faster code paths. <b>0.75 s</b>, a 3.6× improvement.`}],
+ f=>{const L=(f.v===1?CS1:CS2).slice(0,f.k),S=2800;return '<div class="tl">'+L.map(s=>'<div style="width:'+(s[1]/S*100)+'%;background:var('+s[2]+')" title="'+s[0]+'">'+(s[1]>=150?s[1]:'')+'</div>').join('')+'</div><div class="kvs">'+L.map(s=>'<span class="kv">'+s[0]+': '+s[1]+' ms</span>').join('')+'</div><p class="note">'+(f.v===1?'before':'after')+' · total '+L.reduce((a,s)=>a+s[1],0)+' ms · scale 2.8 s</p>';});
+
+// PKCE
+linePlayer('w-mb-pkce',`Sign-in without exposing a client secret (mobile apps can't keep one) and without the app ever seeing the password.`,[
+ ['App',`Generates a random <code>code_verifier</code> and its SHA-256 hash, the <code>code_challenge</code>.`,`The verifier stays secret on the device. Only its hash is sent.`],
+ ['Browser',`Opens the system browser (ASWebAuthenticationSession / Custom Tabs) at <code>/authorize?code_challenge=…</code>.`,`The <b>system browser</b>, not a web view, so the app can't read the password and the user sees the real login page.`],
+ ['User',`Logs in (with password, passkey or 2FA) at the identity provider.`,`Authentication happens entirely at the provider.`],
+ ['Redirect',`The provider redirects to <code>myapp://callback?code=XYZ</code> (or a verified universal/app link).`,`The short-lived <b>authorization code</b> returns to the app.`],
+ ['App → token',`Sends <code>code=XYZ + code_verifier</code> to <code>/token</code>.`,`The server hashes the verifier and checks it matches the challenge. A malicious app that intercepted the code can't use it without the verifier.`],
+ ['Tokens',`Receives a short-lived access token and a refresh token, stored in <b>Keychain / Keystore</b>.`,`Refresh silently when the access token expires. On logout, revoke and wipe.`]]);
+
+// staged rollout
+const RO=[[1,99.8,''],[2,99.8,''],[5,98.9,'halt'],[5,98.9,'flag'],[5,99.8,''],[20,99.8,''],[50,99.7,''],[100,99.8,'']];
+player('w-mb-rollout',()=>[{k:-1,msg:`Version 4.2 ships to 1% of users first. Gate: crash-free users must stay at or above 99.5%.`},...RO.map((r,i)=>({k:i,msg:r[2]==='halt'?'<b>5%</b>: crash-free users dropped to <b>98.9%</b>. Rollout <b>halted</b> automatically. Crash reports point to the new video player on Android 10.':r[2]==='flag'?'Turn off the new player with a <b>remote feature flag</b>. No new build needed, so the users already on 4.2 are protected in minutes.':i===4?'Crash-free is back to 99.8% with the flag off. A fixed build (4.2.1) is queued, and the rollout resumes.':'<b>'+r[0]+'%</b> of users · crash-free '+r[1]+'%'+(r[0]===100?'. Fully released.':'. Healthy, so it continues.')}))],
+ f=>{const r=f.k>=0?RO[f.k]:[0,0,''];return '<div class="pipe">'+[1,2,5,20,50,100].map(p=>'<span class="stg '+(r[0]>p||(r[0]===p&&!r[2])?'ok':r[0]===p&&r[2]==='halt'?'fail':r[0]===p?'run':'')+'">'+p+'%</span>').join('')+'</div>'+
+   (f.k>=0?'<div class="metrics"><div class="metric'+(r[1]<99.5?' bad':'')+'">Crash-free users<b>'+r[1]+'%</b></div><div class="metric">Gate<b>≥ 99.5%</b></div><div class="metric">New video player<b>'+(f.k>=3?'off (flag)':'on')+'</b></div></div>':'');});
+
+// diagrams
+diagram('dg-mb-arch',860,300,[ND('ui',80,150,'UI','Compose / SwiftUI','acc',130),ND('vm',250,150,'ViewModel','UI state + events','',140),ND('repo',430,150,'Repository','cache vs network','acc',140),
+  ND('db',640,60,'Local DB','source of truth','',160),ND('api',640,150,'API client','REST / GraphQL','',160),ND('img',640,240,'Image pipeline','memory + disk cache','',160),
+  ND('sync',430,262,'Sync worker','WorkManager / BGTask','hl',150),ND('push',800,262,'Push','APNs / FCM','',90)],
+  [['ui','vm','events'],['vm','repo'],['repo','db','observe'],['repo','api','fetch'],['ui','img','load',{dash:1}],['sync','api'],['sync','db'],['push','sync','wake',{dash:1}]]);
+diagram('dg-mb-feed',860,300,[ND('ui',80,150,'Feed screen','LazyColumn / List','acc',140),ND('vm',255,150,'FeedViewModel','paging state','',140),ND('pg',430,60,'Pager + RemoteMediator','cursor pages','',180),
+  ND('db',650,60,'Room / SwiftData','posts, cursors, outbox','acc',180),ND('api',650,150,'Feed API','/v1/feed?cursor','',180),ND('img',255,262,'Image loader','downsample · LRU · prefetch','',190),
+  ND('ob',430,250,'Outbox worker','likes, retries','hl',150),ND('cdn',650,250,'Image CDN','sized variants','',150)],
+  [['ui','vm'],['vm','pg'],['pg','db','reads'],['pg','api','loads pages'],['ui','img'],['img','cdn'],['ob','api','POST like'],['ob','db','',{dash:1}]]);
+diagram('dg-mb-chat',860,300,[ND('ui',80,150,'Conversation','observes DB','acc',130),ND('vm',250,150,'ChatViewModel','send, paginate','',140),ND('db',440,60,'Local DB','messages, states, cursors','acc',190),
+  ND('send',440,150,'Sender service','queue, retry, dedupe','',170),ND('ws',650,90,'WebSocket','live while foreground','',170),ND('rest',650,210,'REST','history, uploads','',170),ND('push',440,262,'Push handler','APNs / FCM','hl',150),ND('srv',820,150,'Server','sequence numbers','',90)],
+  [['ui','vm'],['vm','db','observe'],['vm','send','send'],['send','ws'],['ws','db','incoming'],['ws','srv',''],['rest','srv'],['push','db','wake + fetch',{dash:1}]]);
+
+const MB_IQ={
+ 'mb-life':[["What happens to your app on rotation, and how do you keep state?","On Android, a configuration change destroys and recreates the Activity. UI state lives in a ViewModel (which survives the change) and the UI re-collects it. Small critical state (form step, scroll position, IDs) also goes in SavedStateHandle / rememberSaveable to survive process death. On iOS there's no recreation on rotation, but the layout changes."],["What is process death, and how do you test for it?","The OS kills a background app's process to reclaim memory. On return, the system restores the navigation stack but all in-memory objects are gone. Persist small UI state with SavedStateHandle or state restoration, reload data from the DB, and test with \"Don't keep activities\", adb shell am kill, or by simulating memory pressure on iOS."]],
+ 'mb-frame':[["Your feed stutters while scrolling. How do you find and fix it?","Reproduce on a mid-range device in a release build, then profile (Perfetto/JankStats or Instruments Hitches/Time Profiler) to find long main-thread frames. Typical causes: image decoding or resizing on the main thread, I/O in bind, heavy layouts, excessive recomposition (unstable parameters) or SwiftUI body work. Fix the cause and verify with a benchmark."],["Why must network and disk work stay off the main thread?","The main thread renders every frame and handles input, with a budget of 16.7 ms at 60 Hz (8.3 ms at 120 Hz). Blocking it drops frames, and long blocks cause ANRs on Android or hang reports and watchdog kills on iOS."]],
+ 'mb-list':[["How does RecyclerView / UICollectionView keep long lists fast?","They create only enough views to fill the screen, and recycle views that scroll off by re-binding them to new items. Bind must be cheap and must fully reset the view, including cancelling stale image loads. Stable IDs and diffing (DiffUtil, diffable data sources) enable minimal updates and animations."]],
+ 'mb-arch':[["Explain MVVM with unidirectional data flow.","The UI sends events to the ViewModel. The ViewModel calls repositories and exposes a single immutable UI state (StateFlow, @Published or @Observable). The UI renders that state. Data flows one way, which makes state predictable, testable and easy to debug."],["How do you handle one-off events like showing a snackbar or navigating?","Model them as part of state that the UI consumes and clears, or use a channel or SharedFlow collected lifecycle-aware. Avoid sticky LiveData-style events that re-fire after rotation."]],
+ 'mb-conc':[["Coroutines vs threads? What is structured concurrency?","Coroutines are lightweight, suspendable tasks scheduled on thread pools (dispatchers), so thousands are cheap. Structured concurrency ties every coroutine to a scope (viewModelScope, lifecycleScope): cancelling the scope cancels its children, preventing leaks and callbacks into dead screens. Swift's Task trees and actors follow the same idea."],["What does @MainActor (or Dispatchers.Main) guarantee?","Code runs on the main thread, which is required for UI updates. The compiler (Swift) or dispatcher (Kotlin) enforces it, while heavy work runs elsewhere and hops back to update state."]],
+ 'mb-offline':[["Design offline support for a notes app.","The local DB is the source of truth, and the UI observes it. Edits apply locally and enter an outbox with client-generated IDs. A background worker syncs when online, with backoff. Pull changes since the last sync token. Resolve conflicts with versions (field-level merge, or keep both copies), and show sync status in the UI."],["How do you make sync requests safe to retry?","Give every client action a unique ID (an idempotency key) that the server de-duplicates on. Retries after timeouts then never create duplicates, which matters because mobile connections drop mid-request."]],
+ 'mb-store':[["Where would you store an auth token, and why not SharedPreferences or UserDefaults?","In Keychain (iOS) or a Keystore-backed encrypted store (Android). Plain preferences are stored unencrypted and can be read from backups or rooted/jailbroken devices. Use short-lived access tokens with refresh, and clear them on logout."]],
+ 'mb-perf':[["How would you reduce app startup time?","Measure cold start first (Macrobenchmark, Play Vitals, Instruments App Launch). Defer non-critical SDK initialization, avoid work in Application/AppDelegate, show cached content instead of waiting for the network, reduce dynamic libraries (iOS), and add Baseline Profiles (Android). Track it in CI and in production."],["How do you find and fix a memory leak?","Use LeakCanary (Android), or Instruments Leaks and the Xcode memory graph (iOS), to find objects retained after their screen closes. Common causes: closures capturing self strongly, long-lived singletons holding an Activity or Context, unremoved listeners, and static references. Fix with weak references and lifecycle-scoped subscriptions."]],
+ 'mb-sec':[["How do you implement secure login in a mobile app?","OAuth 2.0 authorization code flow with PKCE, through the system browser, using verified app links or a custom scheme for the redirect. Store tokens in Keychain/Keystore. Use short-lived access tokens with silent refresh, biometric unlock bound to a secure key, and revoke tokens on logout."],["Can you hide an API key in the app?","No. Anything shipped in the binary can be extracted. Keep secret keys on your server, proxy third-party calls through it, and use app attestation (App Attest, Play Integrity) and rate limits to reduce abuse."]],
+ 'mb-release':[["A new release is crashing for 2% of users. What do you do?","Halt the staged rollout. Check crash reports for the top stack trace and the affected OS versions and devices. Disable the feature with a remote flag if possible. Ship a hotfix through an expedited review, and use force-update only if it's severe. Then add a test and analyze why it escaped QA."],["Why can't you just roll back a mobile release?","Users who already updated keep that version on their device, and app stores don't support true rollback. So you rely on staged rollouts, feature flags, server-driven kill switches, backward-compatible APIs and forward fixes."]],
+ 'mb-sysd':[["Design the Instagram feed on the client side.","Cover requirements, then a cursor-paginated API with image dimensions and placeholders. Use MVVM + repository with the DB as source of truth (Paging + RemoteMediator). The image pipeline downsamples, caches in memory and on disk, cancels on reuse and prefetches. Likes are optimistic with an outbox. Add pull-to-refresh, a \"new posts\" pill, offline behaviour, low-end device handling, and monitoring of startup, jank and errors."],["How do push notifications work end to end?","The app registers with APNs/FCM and gets a device token, which it sends to your backend. The backend sends a payload through APNs/FCM. Notification payloads are shown by the OS; data or silent pushes wake the app briefly to sync. Handle token refresh, permission prompts in context, deep links from taps, and per-category user settings."]],
+ 'mb-d-case':[["How do you avoid the list jumping when new posts arrive?","Don't insert at the top while the user is scrolling. Show a \"new posts\" pill and insert on tap or refresh. Keep stable keys and preserve the scroll anchor. Placeholders with known dimensions prevent layout shifts as images load."],["How would you support a low-end device on a 3G connection?","Request smaller image variants based on network type and screen density, limit concurrent downloads, prioritize visible rows, reduce prefetch distance, rely on cached content, and measure with real low-end devices and network throttling."]],
+ 'mb-d-chat':[["How do you guarantee message order and avoid duplicates?","The client creates a unique client_id per message and shows it immediately as \"sending\". The server assigns a per-conversation sequence number and echoes the client_id back. The client sorts by sequence (local pending messages last), de-dupes on client_id, and resyncs gaps using the last known sequence after reconnecting."],["The app is killed while a message is sending. What happens?","The message is already persisted in the DB as queued. On the next launch, or when a background job runs, the sender service retries it with the same client_id, so the server de-duplicates it if the first attempt actually arrived."]]
+};
+Object.assign(IQ,MB_IQ);
+
 // inject question blocks + rating controls; build the review bank
 const QB=[];
 Object.entries(IQ).forEach(([id,qs])=>{const sec=document.getElementById(id);if(!sec)return;
@@ -8726,7 +9434,7 @@ function rateQ(qid,r){const q=Object.assign({b:0},P.data.qs[qid]),now=Date.now()
 const qState=qid=>{const q=P.data.qs[qid];return !q?'new':q.b>=3?'mastered':'learning';};
 
 // dashboard
-const SUBJ_ORDER=['dsa','se','ds','sr','ai','bl'];
+const SUBJ_ORDER=['dsa','se','ds','sr','ai','mb','bl'];
 function renderDash(){const el=document.getElementById('prep-dash');if(!el)return;
   el.innerHTML=SUBJ_ORDER.map(s=>{const sj=document.getElementById('s-'+s),qs=QB.filter(q=>q.s===s),c={mastered:0,learning:0,new:0};qs.forEach(q=>c[qState(q.qid)]++);
     const ts=[...sj.querySelectorAll('.mark')].map(m=>P.data.topics[m.dataset.id]),done=ts.filter(v=>v==='done').length,shaky=ts.filter(v=>v==='shaky').length,n=qs.length||1;
@@ -8954,7 +9662,7 @@ const SUBJ=[...document.querySelectorAll('.subject')],sideNav=document.getElemen
 const topicsOf=s=>[...document.querySelectorAll('#s-'+s+' .topic')];
 const DSA_DEEP={bigo:'d-bigo',hash:'d-hash',two:'d-two',slide:'d-slide',stack:'d-stack',bs:'d-bs',ll:'d-ll',tree:'d-tree',graph:'d-graph',bt:'d-bt',dp:'d-dp'};
 Object.entries(DSA_DEEP).forEach(([sec,id])=>{document.getElementById(sec).dataset.deep=id;});
-const BADGE={prep:'✓',dsa:'{ }',se:'&lt;/&gt;',ds:'⇄',sr:'★',ai:'AI',bl:'“ ”'};
+const BADGE={prep:'✓',dsa:'{ }',se:'&lt;/&gt;',ds:'⇄',sr:'★',ai:'AI',mb:'▯',bl:'“ ”'};
 SUBJ.forEach(sj=>{const s=sj.dataset.s,T=topicsOf(s);
   T.forEach((t,i)=>{t.querySelector('.eyebrow').textContent='Deep dive · topic '+(i+1)+' of '+T.length;
     const pg=document.createElement('div');pg.className='pager';
