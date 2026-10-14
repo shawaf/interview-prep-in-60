@@ -1,0 +1,28 @@
+{
+  "name": "Interview Prep in 60",
+  "short_name": "Prep in 60",
+  "description": "Animated interview prep: DSA, SWE, distributed systems, senior, AI, mobile, frontend and behavioral.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#262624",
+  "theme_color": "#D97757",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

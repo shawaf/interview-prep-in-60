@@ -3,7 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Interview prep in 60 minutes per subject: DSA, software engineering, distributed systems, senior track, AI engineering, mobile and behavioral rounds, with animations and practice tools.">
+<meta name="description" content="Interview prep in 60 minutes per subject: DSA, software engineering, distributed systems, senior track, AI engineering, mobile, frontend and behavioral rounds, with animations and practice tools. Works offline.">
+<meta name="theme-color" content="#D97757">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Prep in 60">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
@@ -433,6 +439,29 @@ select{font:inherit;padding:6px 10px;border-radius:6px;border:1px solid var(--li
 .bubble{padding:8px 12px;border-radius:10px;font-size:.88rem;white-space:pre-wrap;max-width:92%}
 .bubble.me{align-self:flex-end;background:var(--accent-soft)}
 .bubble.ai{align-self:flex-start;background:var(--bg)}
+/* export + print */
+.tabs .tab-export{margin-left:auto;align-self:center;border:1px solid var(--line);border-radius:6px;padding:6px 12px;font-size:.8rem;font-weight:500;color:var(--ink)}
+.export-btn{font-size:.78rem;padding:4px 10px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:50;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:.88rem;max-width:min(92vw,520px);box-shadow:0 8px 30px rgba(0,0,0,.25)}
+#print-root{display:none}
+.print-light{--bg:#F4F6FB;--surface:#FFFFFF;--ink:#14213D;--muted:#56617D;--line:#D8DEEB;--accent:#2B59C3;--accent-soft:#E2E9FA;--hl:#E09B1A;--hl-soft:#FDF0D5;--ptr:#C9430C;--ok:#2B8A3E;--ok-soft:#DFF3E3;--dim:#B9C2D6;--bad:#C92A2A;--bad-soft:#FBE4E4;--c1:#2B8A3E;--c2:#0C8599;--c3:#2B59C3;--c4:#7048E8;--c5:#D9480F;--c6:#C92A2A;color:var(--ink);background:#fff;color-scheme:light}
+.print-doc{font-family:var(--f-body);font-size:13px;line-height:1.55;padding:4px 2px}
+.print-doc .print-head{border-bottom:2px solid var(--accent);margin-bottom:14px;padding-bottom:8px}
+.print-doc h1{font-size:1.9rem}
+.print-doc section,.print-doc .topic{display:flex;flex-direction:column;gap:12px;padding-top:18px}
+.print-doc .widget,.print-doc pre,.print-doc tr,.print-doc .callout,.print-doc .dcard,.print-doc .iq details{break-inside:avoid}
+.print-doc pre{white-space:pre-wrap;word-break:break-word}
+.print-doc .codeview{flex:none;white-space:pre-wrap;word-break:break-word}
+.print-doc .stage{min-height:0}
+@media print{
+  body{background:#fff!important}
+  .side,.topbar,.scrim,.tabs,#toast,.mark,.pager{display:none!important}
+  .app{display:block}
+  body.printing .app{display:none!important}
+  body.printing #print-root{display:block}
+  body.printing .print-doc section + section,body.printing .print-doc .topic + .topic{break-before:page}
+  .chartwrap,.tbl,.stage{overflow:visible!important}
+}
 /* interview questions */
 .iq{display:flex;flex-direction:column;gap:6px;border:1px solid var(--accent);border-radius:12px;padding:14px 16px;background:var(--surface)}
 .iq>.eyebrow{margin:0 0 2px}
@@ -7408,6 +7437,591 @@ DELETE /v1/posts/{id}/like</code></pre>
 </div><!-- /mb-deep -->
 </div><!-- /s-mb -->
 
+<!-- ===================================================== -->
+<!-- FRONTEND ENGINEERING                                   -->
+<!-- ===================================================== -->
+<div class="subject" id="s-fe" data-s="fe" data-name="Frontend Engineering" hidden>
+<header>
+  <p class="eyebrow">Crash course · frontend and web interviews</p>
+  <h1>Frontend engineering in <span>60 minutes</span></h1>
+  <p class="lede">Frontend loops test JavaScript depth, how browsers render, React (or another framework) internals, performance, accessibility, security, and <b>frontend system design</b>: designing a UI component or web app end to end. Eleven topics cover what interviewers probe, each with an animation and model answers. The <b>Deep dive</b> tab opens with a frontend interview playbook, includes the classic JavaScript coding questions with solutions, and ends with two full designs.</p>
+</header>
+<div class="tabs" role="tablist" aria-label="Frontend sections">
+  <button role="tab" id="fe-tb-crash" aria-selected="true" aria-controls="fe-crash" data-tab="crash">Crash course · 60 min</button>
+  <button role="tab" id="fe-tb-deep" aria-selected="false" aria-controls="fe-deep" data-tab="deep">Deep dive · topic by topic</button>
+</div>
+<div id="fe-crash" class="panel" data-panel="crash" role="tabpanel" aria-labelledby="fe-tb-crash">
+  <nav class="map" aria-label="Minute map">
+    <a href="#fe-crp" style="--m:6"><b>0–6</b>Rendering</a>
+    <a href="#fe-loop" style="--m:6"><b>6–12</b>Event loop</a>
+    <a href="#fe-closure" style="--m:5"><b>12–17</b>Closures &amp; scope</a>
+    <a href="#fe-events" style="--m:4"><b>17–21</b>DOM events</a>
+    <a href="#fe-react" style="--m:6"><b>21–27</b>React rendering</a>
+    <a href="#fe-state" style="--m:5"><b>27–32</b>State</a>
+    <a href="#fe-vitals" style="--m:6"><b>32–38</b>Web performance</a>
+    <a href="#fe-ssr" style="--m:6"><b>38–44</b>Rendering strategies</a>
+    <a href="#fe-a11y" style="--m:5"><b>44–49</b>Accessibility</a>
+    <a href="#fe-sec" style="--m:4"><b>49–53</b>Security</a>
+    <a href="#fe-sysd" style="--m:7"><b>53–60</b>Frontend system design</a>
+  </nav>
+  <p class="maplegend">Examples use React, the most common framework in interviews, but the concepts carry over to Vue, Angular, Svelte and Solid.</p>
+
+<section id="fe-crp" data-deep="fe-d-perf">
+  <div><p class="eyebrow">Minutes 0–6</p><h2>How the browser renders a page</h2></div>
+  <ul class="pts">
+    <li>The <b>critical rendering path</b>: HTML is parsed into the <b>DOM</b>, CSS into the <b>CSSOM</b>, they combine into the <b>render tree</b>, then the browser computes <b>layout</b> (sizes and positions), <b>paints</b> pixels into layers, and <b>composites</b> the layers on the GPU.</li>
+    <li>CSS is <b>render-blocking</b>, and a plain <code>&lt;script&gt;</code> is <b>parser-blocking</b>. Use <code>defer</code> or <code>async</code> and inline only critical CSS.</li>
+    <li>Changing geometry (width, top, font-size) triggers <b>layout + paint + composite</b>: expensive. Changing <code>transform</code> or <code>opacity</code> can be <b>composite-only</b>, which is why smooth animations use them.</li>
+    <li><b>Layout thrashing:</b> reading layout (<code>offsetHeight</code>) right after writing styles, in a loop, forces repeated synchronous layouts. Batch reads, then writes.</li>
+  </ul>
+  <div class="widget" id="w-fe-crp">
+    <div class="whead"><span class="wtitle">Animation · the rendering pipeline, and what a change costs</span></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+  <div class="links">
+    <a class="watch" href="https://web.dev/articles/critical-rendering-path" target="_blank" rel="noopener">web.dev: critical rendering path</a>
+    <a class="watch" href="https://www.youtube.com/results?search_query=how+browsers+work+rendering+pipeline+explained" target="_blank" rel="noopener">Watch: how browsers render</a>
+  </div>
+</section>
+
+<section id="fe-loop" data-deep="fe-d-js">
+  <div><p class="eyebrow">Minutes 6–12</p><h2>The JavaScript event loop</h2></div>
+  <ul class="pts">
+    <li>JavaScript runs on <b>one thread</b>. The <b>call stack</b> runs synchronous code. Async work (timers, network, events) is handled by the browser, and its callbacks are queued.</li>
+    <li>Two queues: <b>microtasks</b> (promise callbacks, <code>queueMicrotask</code>, MutationObserver) and <b>tasks / macrotasks</b> (<code>setTimeout</code>, events, I/O).</li>
+    <li>The loop: run one task → run <b>all</b> microtasks → maybe render → next task. So promise callbacks always run before the next <code>setTimeout</code>, even one with 0 ms.</li>
+    <li>A long task (over 50 ms) blocks input and rendering. Break up work, or move it to a Web Worker.</li>
+  </ul>
+  <div class="widget" id="w-fe-loop">
+    <div class="whead"><span class="wtitle">Animation · predict the output order</span></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+  <div class="links">
+    <a class="watch" href="https://www.youtube.com/results?search_query=jake+archibald+in+the+loop+event+loop" target="_blank" rel="noopener">Watch: Jake Archibald, In The Loop</a>
+    <a class="watch" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop" target="_blank" rel="noopener">MDN: the event loop</a>
+  </div>
+</section>
+
+<section id="fe-closure" data-deep="fe-d-js">
+  <div><p class="eyebrow">Minutes 12–17</p><h2>Closures, scope &amp; <code>this</code></h2></div>
+  <ul class="pts">
+    <li>A <b>closure</b> is a function plus the variables it captured from where it was defined. They power callbacks, module patterns, memoization, and React hooks.</li>
+    <li><code>var</code> is function-scoped and hoisted (as undefined). <code>let</code>/<code>const</code> are block-scoped, with a <b>temporal dead zone</b> before their declaration. In a <code>for</code> loop, <code>let</code> creates a fresh binding per iteration.</li>
+    <li><code>this</code> depends on <b>how a function is called</b>: method call → the object, plain call → undefined (strict mode), <code>new</code> → the new object, <code>call/apply/bind</code> → explicit. <b>Arrow functions</b> have no own <code>this</code>; they use the enclosing one.</li>
+  </ul>
+  <div class="widget" id="w-fe-closure">
+    <div class="whead"><span class="wtitle">Animation · the classic loop + setTimeout question</span>
+      <div class="controls" id="clo-mode"><button data-m="var" class="sel">var</button><button data-m="let">let</button></div></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+<pre><code>function makeCounter() {
+  let count = 0;                       // private: only the closure can reach it
+  return { inc: () =&gt; ++count, get: () =&gt; count };
+}
+const c = makeCounter(); c.inc(); c.inc(); c.get();   // 2
+
+const user = { name: "Mona", greet() { return this.name; } };
+const g = user.greet; g();            // undefined: called without an object
+const bound = user.greet.bind(user); bound();   // "Mona"</code></pre>
+  <div class="links">
+    <a class="watch" href="https://javascript.info/closure" target="_blank" rel="noopener">javascript.info: closures</a>
+  </div>
+</section>
+
+<section id="fe-events" data-deep="fe-d-js">
+  <div><p class="eyebrow">Minutes 17–21</p><h2>DOM events: capture, bubble, delegate</h2></div>
+  <ul class="pts">
+    <li>An event travels in three phases: <b>capture</b> (window down to the target), <b>target</b>, then <b>bubble</b> (back up). Listeners run in the bubble phase unless you pass <code>{ capture: true }</code>.</li>
+    <li><b>Event delegation:</b> one listener on a parent handles events for many children (use <code>event.target.closest(...)</code>). Fewer listeners, and it works for items added later.</li>
+    <li><code>stopPropagation()</code> stops the journey; <code>preventDefault()</code> cancels the browser's default action (following a link, submitting a form). They're different.</li>
+  </ul>
+  <div class="widget" id="w-fe-events">
+    <div class="whead"><span class="wtitle">Animation · a click's journey, and delegation</span></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+<pre><code>// one listener for every current and future "delete" button in the list
+list.addEventListener("click", (e) =&gt; {
+  const btn = e.target.closest("button[data-action='delete']");
+  if (!btn || !list.contains(btn)) return;
+  removeItem(btn.closest("li").dataset.id);
+});</code></pre>
+  <div class="links">
+    <a class="watch" href="https://javascript.info/bubbling-and-capturing" target="_blank" rel="noopener">javascript.info: bubbling and capturing</a>
+  </div>
+</section>
+
+<section id="fe-react" data-deep="fe-d-react">
+  <div><p class="eyebrow">Minutes 21–27</p><h2>React rendering &amp; reconciliation</h2></div>
+  <ul class="pts">
+    <li>A state update <b>re-renders</b> that component and, by default, <b>all its children</b>. Rendering means calling your component functions to get new elements, not touching the DOM.</li>
+    <li>React then <b>reconciles</b>: it diffs the new element tree against the old one and <b>commits</b> only the real DOM changes. Element type and <b>keys</b> decide whether a node is updated or replaced (and its state kept or reset).</li>
+    <li>Skip unnecessary re-renders with <code>React.memo</code> plus stable props (<code>useMemo</code>, <code>useCallback</code>), by moving state down, or by passing components as <code>children</code>. Measure with the React Profiler first. The React Compiler can memoize automatically.</li>
+    <li>Use stable, unique keys from your data, not array indexes, for lists that can reorder.</li>
+  </ul>
+  <div class="widget" id="w-fe-react">
+    <div class="whead"><span class="wtitle">Animation · what re-renders when cart state changes</span>
+      <div class="controls" id="react-mode"><button data-m="plain" class="sel">No memo</button><button data-m="memo">With memo</button></div></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+<pre><code>const ProductList = React.memo(function ProductList({ products, onAdd }) {
+  return products.map(p =&gt; &lt;Item key={p.id} product={p} onAdd={onAdd} /&gt;);   // stable keys
+});
+
+function App() {
+  const [cart, setCart] = useState([]);
+  const onAdd = useCallback(p =&gt; setCart(c =&gt; [...c, p]), []);   // same function every render
+  return (&lt;&gt;
+    &lt;ProductList products={products} onAdd={onAdd} /&gt;   {/* skipped when only cart changes */}
+    &lt;Cart items={cart} /&gt;
+  &lt;/&gt;);
+}</code></pre>
+  <div class="links">
+    <a class="watch" href="https://react.dev/learn/render-and-commit" target="_blank" rel="noopener">react.dev: render and commit</a>
+    <a class="watch" href="https://www.youtube.com/results?search_query=react+re+renders+explained+memo+useCallback" target="_blank" rel="noopener">Watch: React re-renders explained</a>
+  </div>
+</section>
+
+<section id="fe-state" data-deep="fe-d-react">
+  <div><p class="eyebrow">Minutes 27–32</p><h2>State management: what goes where</h2></div>
+  <ul class="pts">
+    <li><b>Local UI state</b> (is this dropdown open?): <code>useState</code> in the component that needs it. Lift it up only as far as necessary.</li>
+    <li><b>Server state</b> (data from an API) is a <i>cache</i>, not app state: use React Query / TanStack Query, SWR, RTK Query or framework loaders for caching, refetching, de-duplication and invalidation.</li>
+    <li><b>URL state</b> (filters, page, selected tab): keep it in the URL so it's shareable, bookmarkable and survives reloads.</li>
+    <li><b>Global client state</b> (auth user, theme, complex editors): Context for rarely-changing values; a store (Redux Toolkit, Zustand, Jotai) for frequently-changing shared state.</li>
+    <li>Derive what you can instead of storing it, and avoid duplicating the same data in two places.</li>
+  </ul>
+  <div class="widget" id="w-fe-state">
+    <div class="whead"><span class="wtitle">Animation · where should this state live?</span></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+  <div class="links">
+    <a class="watch" href="https://react.dev/learn/managing-state" target="_blank" rel="noopener">react.dev: managing state</a>
+    <a class="watch" href="https://tanstack.com/query/latest" target="_blank" rel="noopener">TanStack Query</a>
+  </div>
+</section>
+
+<section id="fe-vitals" data-deep="fe-d-perf">
+  <div><p class="eyebrow">Minutes 32–38</p><h2>Web performance &amp; Core Web Vitals</h2></div>
+  <ul class="pts">
+    <li><b>LCP</b> (Largest Contentful Paint): when the main content appears. Good is under <b>2.5 s</b>.</li>
+    <li><b>INP</b> (Interaction to Next Paint): how fast the page responds to clicks and keys. Good is under <b>200 ms</b>.</li>
+    <li><b>CLS</b> (Cumulative Layout Shift): how much content jumps around. Good is under <b>0.1</b>.</li>
+    <li>Biggest levers: ship less JavaScript (code splitting, tree shaking), optimize images (modern formats, sizes, lazy loading, priority for the hero), cache at the CDN, reserve space for media and ads, break up long tasks, and preload critical fonts and resources.</li>
+    <li>Measure both <b>lab</b> (Lighthouse, WebPageTest) and <b>field</b> data from real users (CrUX, RUM, the web-vitals library).</li>
+  </ul>
+  <div class="widget" id="w-fe-vitals">
+    <div class="whead"><span class="wtitle">Animation · a page load, measured and then fixed</span></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+  <div class="links">
+    <a class="watch" href="https://web.dev/articles/vitals" target="_blank" rel="noopener">web.dev: Web Vitals</a>
+    <a class="watch" href="https://www.youtube.com/results?search_query=core+web+vitals+LCP+INP+CLS+explained" target="_blank" rel="noopener">Watch: Core Web Vitals explained</a>
+  </div>
+</section>
+
+<section id="fe-ssr" data-deep="fe-d-arch">
+  <div><p class="eyebrow">Minutes 38–44</p><h2>Rendering strategies: CSR, SSR, SSG &amp; more</h2></div>
+  <ul class="pts">
+    <li><b>CSR</b> (client-side rendering): the server sends an empty shell plus JS, and the browser builds the page. Simple hosting and app-like, but slow first paint and weaker SEO.</li>
+    <li><b>SSR</b> (server-side rendering): HTML is generated per request, so content appears fast, then JS <b>hydrates</b> it to make it interactive. Costs server time per request.</li>
+    <li><b>SSG</b> (static generation): HTML built at deploy time and served from a CDN, which is fastest, but content is only as fresh as the last build. <b>ISR</b> regenerates pages periodically or on demand.</li>
+    <li><b>Streaming SSR</b> and <b>React Server Components</b> send HTML in chunks and keep server-only code off the client. <b>Islands</b> (Astro) hydrate only the interactive parts.</li>
+    <li>Choose per page: marketing and docs → SSG/ISR; personalized dashboards → SSR or CSR behind auth; SEO-critical dynamic pages → SSR.</li>
+  </ul>
+  <div class="widget" id="w-fe-ssr">
+    <div class="whead"><span class="wtitle">Animation · when content appears and when it's interactive</span></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+  <div class="links">
+    <a class="watch" href="https://www.patterns.dev/react/" target="_blank" rel="noopener">patterns.dev: rendering patterns</a>
+    <a class="watch" href="https://www.youtube.com/results?search_query=CSR+vs+SSR+vs+SSG+vs+ISR+explained" target="_blank" rel="noopener">Watch: CSR vs SSR vs SSG</a>
+  </div>
+</section>
+
+<section id="fe-a11y" data-deep="fe-d-a11y">
+  <div><p class="eyebrow">Minutes 44–49</p><h2>Accessibility (a11y)</h2></div>
+  <ul class="pts">
+    <li><b>Semantic HTML first:</b> <code>&lt;button&gt;</code>, <code>&lt;a href&gt;</code>, <code>&lt;label&gt;</code>, headings, landmarks (<code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>). They come with keyboard support and screen-reader meaning for free. A clickable <code>&lt;div&gt;</code> has neither.</li>
+    <li>Everything must work with a <b>keyboard</b>: visible focus, logical tab order, Escape closes dialogs, and focus is <b>trapped</b> in a modal and <b>returned</b> to the trigger when it closes.</li>
+    <li>Use <b>ARIA</b> only when HTML can't express it (<code>aria-expanded</code>, <code>aria-live</code>, roles for custom widgets). Wrong ARIA is worse than none.</li>
+    <li>Text contrast of at least <b>4.5:1</b>, alt text for meaningful images, captions, and respect <code>prefers-reduced-motion</code>. The standard is <b>WCAG 2.2 AA</b>.</li>
+  </ul>
+  <div class="widget" id="w-fe-a11y">
+    <div class="whead"><span class="wtitle">Animation · keyboard focus through a page and a modal</span></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+  <div class="links">
+    <a class="watch" href="https://www.w3.org/WAI/ARIA/apg/" target="_blank" rel="noopener">WAI-ARIA Authoring Practices</a>
+    <a class="watch" href="https://web.dev/learn/accessibility" target="_blank" rel="noopener">web.dev: Learn Accessibility</a>
+  </div>
+</section>
+
+<section id="fe-sec" data-deep="fe-d-sec">
+  <div><p class="eyebrow">Minutes 49–53</p><h2>Frontend security &amp; CORS</h2></div>
+  <ul class="pts">
+    <li><b>XSS:</b> never inject untrusted strings as HTML (<code>innerHTML</code>, <code>dangerouslySetInnerHTML</code>) without sanitizing (DOMPurify). Frameworks escape text by default. Add a <b>Content-Security-Policy</b>.</li>
+    <li><b>Tokens:</b> HttpOnly, Secure, SameSite cookies are safer than localStorage, which any XSS can read. Use CSRF protection when using cookies.</li>
+    <li><b>CORS</b> is a browser rule: a page may only read responses from another origin if that server allows it with <code>Access-Control-Allow-Origin</code>. Non-simple requests send a <b>preflight</b> OPTIONS request first. CORS protects users, not your API: servers still need auth.</li>
+    <li>Also: clickjacking (<code>frame-ancestors</code>), dependency supply chain (lockfiles, audits), and never shipping secrets in the bundle.</li>
+  </ul>
+  <div class="widget" id="w-fe-cors">
+    <div class="whead"><span class="wtitle">Animation · a CORS preflight</span></div>
+    <div class="stage"></div><p class="cap"></p>
+  </div>
+  <div class="links">
+    <a class="watch" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" target="_blank" rel="noopener">MDN: CORS</a>
+    <a class="watch" href="https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html" target="_blank" rel="noopener">OWASP XSS prevention cheat sheet</a>
+  </div>
+</section>
+
+<section id="fe-sysd" data-deep="fe-d-case">
+  <div><p class="eyebrow">Minutes 53–60</p><h2>Frontend system design</h2></div>
+  <ul class="pts">
+    <li>Questions: "design an autocomplete", "a news feed", "a photo gallery", "Google Docs", "a design system", "a checkout flow". You design the <b>client</b>: components, state, data fetching, performance and accessibility.</li>
+    <li>A common framework is <b>RADIO</b>: <b>R</b>equirements (functional, non-functional, devices) → <b>A</b>rchitecture (components and how they talk) → <b>D</b>ata model (client state, normalized caches) → <b>I</b>nterface (API contracts and component props) → <b>O</b>ptimizations (performance, a11y, i18n, offline, security).</li>
+    <li>Senior signals: virtualization for long lists, debouncing and request cancellation, caching and optimistic updates, code splitting, error and loading states, accessibility, and telemetry.</li>
+  </ul>
+  <div class="widget">
+    <div class="whead"><span class="wtitle">Diagram · a typical web app architecture</span></div>
+    <div class="chartwrap" id="dg-fe-arch"></div>
+  </div>
+  <div class="links">
+    <a class="watch" href="https://www.greatfrontend.com/front-end-system-design-playbook" target="_blank" rel="noopener">GreatFrontEnd: system design playbook</a>
+    <a class="watch" href="https://www.youtube.com/results?search_query=frontend+system+design+interview" target="_blank" rel="noopener">Watch: frontend system design interviews</a>
+  </div>
+</section>
+</div><!-- /fe-crash -->
+
+<div id="fe-deep" class="panel" data-panel="deep" role="tabpanel" aria-labelledby="fe-tb-deep" hidden>
+<div class="deep"><div>
+
+<article class="topic" id="fe-d-playbook" data-t="Frontend interview playbook">
+  <p class="eyebrow">Deep dive</p><h2>Frontend interview playbook</h2>
+  <p class="lead">Frontend loops have their own round types. Know which ones you'll face, because each needs different practice.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Round</th><th>Example</th><th>What's scored</th></tr></thead>
+    <tbody>
+      <tr><td>JavaScript coding</td><td>Implement <code>debounce</code>, <code>Promise.all</code>, an event emitter, <code>deepClone</code></td><td>Language depth, edge cases, clean code</td></tr>
+      <tr><td>UI coding</td><td>Build an accordion, tabs, autocomplete, modal or star rating in 45 minutes</td><td>Working UI, state handling, accessibility, styling basics</td></tr>
+      <tr><td>DSA coding</td><td>Same as any SWE loop, usually easier</td><td>Problem solving in JavaScript or TypeScript</td></tr>
+      <tr><td>Frontend system design</td><td>Design a news feed, autocomplete or collaborative editor</td><td>Architecture, data flow, performance, a11y, trade-offs</td></tr>
+      <tr><td>Quiz / fundamentals</td><td>Event loop, closures, CSS specificity, HTTP caching, CORS</td><td>Breadth and precision</td></tr>
+      <tr><td>Behavioral</td><td>Same as any loop</td><td>See Behavioral &amp; Leadership</td></tr>
+    </tbody></table></div>
+  <h3>UI coding round checklist</h3>
+  <ul class="pts">
+    <li>Clarify behaviour and edge cases first (empty, loading, error, long text, many items).</li>
+    <li>Get a working version quickly, then refine. Use semantic HTML, so keyboard and screen readers work.</li>
+    <li>Keep state minimal and derived; handle loading and error states; clean up timers and listeners.</li>
+    <li>Talk through accessibility (labels, roles, focus) and what you'd test.</li>
+  </ul>
+  <div class="links"><a class="prac" href="https://www.greatfrontend.com/" target="_blank" rel="noopener">GreatFrontEnd practice</a><a class="prac" href="https://bigfrontend.dev/" target="_blank" rel="noopener">BFE.dev (JS coding problems)</a><a class="watch" href="https://www.frontendinterviewhandbook.com/" target="_blank" rel="noopener">Front End Interview Handbook</a></div>
+</article>
+
+<article class="topic" id="fe-d-js" data-t="JavaScript in depth">
+  <p class="eyebrow">Deep dive</p><h2>JavaScript in depth</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Topic</th><th>What to know</th></tr></thead>
+    <tbody>
+      <tr><td>Types &amp; equality</td><td>7 primitives plus objects. Use <code>===</code>; <code>==</code> coerces (<code>0 == ""</code> is true). <code>typeof null</code> is "object". <code>NaN !== NaN</code>, so use <code>Number.isNaN</code>.</td></tr>
+      <tr><td>Hoisting &amp; TDZ</td><td>Function declarations are hoisted whole; <code>var</code> as undefined; <code>let/const/class</code> are in the temporal dead zone until declared.</td></tr>
+      <tr><td><code>this</code></td><td>Determined by the call site: method, plain call, <code>new</code>, <code>call/apply/bind</code>. Arrows capture the outer <code>this</code>.</td></tr>
+      <tr><td>Prototypes</td><td>Objects delegate to their prototype chain. <code>class</code> is syntax over prototypes.</td></tr>
+      <tr><td>Promises</td><td>States: pending, fulfilled, rejected. <code>then</code> returns a new promise. <code>Promise.all</code> fails fast; <code>allSettled</code> waits for all; <code>race</code> and <code>any</code>.</td></tr>
+      <tr><td>async/await</td><td>Syntax over promises. Errors become rejections; use try/catch. Run independent awaits in parallel with <code>Promise.all</code>.</td></tr>
+      <tr><td>Modules</td><td>ES modules are static (enables tree shaking); dynamic <code>import()</code> enables code splitting.</td></tr>
+      <tr><td>Memory</td><td>Garbage collected by reachability. Leaks come from forgotten listeners, timers, detached DOM nodes and growing caches.</td></tr>
+    </tbody></table></div>
+<pre><code>// Predict the output
+console.log([] + []);            // ""  (both become "")
+console.log([] == false);        // true  ([] → "" → 0, false → 0)
+console.log(0.1 + 0.2 === 0.3);  // false (floating point)
+console.log(typeof function(){});// "function"
+const p = Promise.reject(new Error("x"));
+p.catch(e =&gt; e.message).then(console.log);   // "x" (catch returns a fulfilled promise)</code></pre>
+  <div class="links"><a class="watch" href="https://javascript.info/" target="_blank" rel="noopener">javascript.info</a><a class="watch" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide" target="_blank" rel="noopener">MDN JavaScript guide</a></div>
+</article>
+
+<article class="topic" id="fe-d-coding" data-t="JavaScript coding questions">
+  <p class="eyebrow">Deep dive</p><h2>Classic JavaScript coding questions</h2>
+  <p class="lead">These come up again and again. Write each from memory, then talk through the edge cases.</p>
+  <h3>debounce and throttle</h3>
+<pre><code>function debounce(fn, wait) {                 // run after the calls stop for `wait` ms
+  let t;
+  return function (...args) {
+    clearTimeout(t);
+    t = setTimeout(() =&gt; fn.apply(this, args), wait);
+  };
+}
+
+function throttle(fn, wait) {                 // run at most once per `wait` ms
+  let last = 0, timer = null;
+  return function (...args) {
+    const now = Date.now(), left = wait - (now - last);
+    if (left &lt;= 0) { last = now; fn.apply(this, args); }
+    else if (!timer) timer = setTimeout(() =&gt; { last = Date.now(); timer = null; fn.apply(this, args); }, left);
+  };
+}</code></pre>
+  <h3>Promise.all</h3>
+<pre><code>function promiseAll(items) {
+  return new Promise((resolve, reject) =&gt; {
+    const results = new Array(items.length);
+    let done = 0;
+    if (items.length === 0) return resolve(results);
+    items.forEach((item, i) =&gt; {
+      Promise.resolve(item).then(v =&gt; {        // accepts plain values too
+        results[i] = v;                         // keep the original order
+        if (++done === items.length) resolve(results);
+      }, reject);                               // first rejection wins
+    });
+  });
+}</code></pre>
+  <h3>Event emitter</h3>
+<pre><code>class Emitter {
+  constructor() { this.handlers = new Map(); }
+  on(evt, fn) {
+    if (!this.handlers.has(evt)) this.handlers.set(evt, new Set());
+    this.handlers.get(evt).add(fn);
+    return () =&gt; this.off(evt, fn);            // return an unsubscribe function
+  }
+  off(evt, fn) { this.handlers.get(evt)?.delete(fn); }
+  once(evt, fn) { const off = this.on(evt, (...a) =&gt; { off(); fn(...a); }); return off; }
+  emit(evt, ...args) { [...(this.handlers.get(evt) ?? [])].forEach(fn =&gt; fn(...args)); }
+}</code></pre>
+  <h3>deepClone and memoize</h3>
+<pre><code>function deepClone(value, seen = new WeakMap()) {
+  if (value === null || typeof value !== "object") return value;
+  if (seen.has(value)) return seen.get(value);              // handles cycles
+  if (value instanceof Date) return new Date(value);
+  const out = Array.isArray(value) ? [] : Object.create(Object.getPrototypeOf(value));
+  seen.set(value, out);
+  for (const key of Reflect.ownKeys(value)) out[key] = deepClone(value[key], seen);
+  return out;
+}   // in real code: structuredClone(value)
+
+function memoize(fn, key = (...a) =&gt; JSON.stringify(a)) {
+  const cache = new Map();
+  return (...args) =&gt; {
+    const k = key(...args);
+    if (!cache.has(k)) cache.set(k, fn(...args));
+    return cache.get(k);
+  };
+}</code></pre>
+  <p class="note">Also practise: <code>curry</code>, <code>flatten</code> (with depth), <code>getElementsByClassName</code>, <code>Array.prototype.map/reduce</code> polyfills, retry with backoff, a promise pool with a concurrency limit, and an LRU cache with a <code>Map</code>.</p>
+  <div class="links"><a class="prac" href="https://bigfrontend.dev/problem" target="_blank" rel="noopener">BFE.dev problems</a><a class="prac" href="https://www.greatfrontend.com/questions/javascript" target="_blank" rel="noopener">GreatFrontEnd JavaScript questions</a></div>
+</article>
+
+<article class="topic" id="fe-d-css" data-t="CSS &amp; layout">
+  <p class="eyebrow">Deep dive</p><h2>CSS &amp; layout</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Topic</th><th>What to know</th></tr></thead>
+    <tbody>
+      <tr><td>Box model</td><td>content + padding + border + margin. <code>box-sizing: border-box</code> makes width include padding and border.</td></tr>
+      <tr><td>Specificity</td><td>Inline &gt; IDs &gt; classes/attributes/pseudo-classes &gt; elements. Later rules win ties. <code>!important</code> overrides, so avoid it. Cascade layers (<code>@layer</code>) control order.</td></tr>
+      <tr><td>Flexbox vs Grid</td><td>Flexbox for one dimension (a row or a column, content-sized). Grid for two dimensions (rows and columns, layout-first).</td></tr>
+      <tr><td>Positioning</td><td>static, relative, absolute (to the nearest positioned ancestor), fixed (to the viewport), sticky (scrolls until a threshold).</td></tr>
+      <tr><td>Stacking contexts</td><td>z-index only competes within the same stacking context. <code>transform</code>, <code>opacity &lt; 1</code>, <code>position</code> with z-index and others create new contexts. That's why z-index: 9999 sometimes "doesn't work".</td></tr>
+      <tr><td>Responsive</td><td>Mobile-first media queries, fluid units (<code>rem</code>, <code>%</code>, <code>clamp()</code>), container queries for component-level responsiveness.</td></tr>
+      <tr><td>Performance</td><td>Animate transform and opacity; avoid layout-triggering properties in animations; <code>content-visibility</code> for offscreen content.</td></tr>
+    </tbody></table></div>
+<pre><code>/* centre anything */
+.center { display: grid; place-items: center; }
+
+/* responsive card grid with no media queries */
+.cards { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+
+/* fluid type between 1rem and 1.5rem */
+.title { font-size: clamp(1rem, 0.8rem + 1vw, 1.5rem); }</code></pre>
+  <div class="links"><a class="watch" href="https://css-tricks.com/snippets/css/a-guide-to-flexbox/" target="_blank" rel="noopener">CSS-Tricks: Flexbox guide</a><a class="watch" href="https://css-tricks.com/snippets/css/complete-guide-grid/" target="_blank" rel="noopener">CSS-Tricks: Grid guide</a></div>
+</article>
+
+<article class="topic" id="fe-d-react" data-t="React in depth">
+  <p class="eyebrow">Deep dive</p><h2>React in depth</h2>
+  <h3>Hooks you must explain</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Hook</th><th>Key point</th></tr></thead>
+    <tbody>
+      <tr><td>useState</td><td>Updates are batched and async; use the function form (<code>setN(n =&gt; n + 1)</code>) when the new value depends on the old one.</td></tr>
+      <tr><td>useEffect</td><td>For syncing with external systems (subscriptions, the DOM, timers), not for deriving data. Return a cleanup. List every dependency. It runs twice on mount in development Strict Mode to surface missing cleanups.</td></tr>
+      <tr><td>useMemo / useCallback</td><td>Cache values and functions between renders. Worth it for expensive work or stable props for memoized children, not everywhere.</td></tr>
+      <tr><td>useRef</td><td>A mutable box that doesn't trigger renders: DOM nodes, timers, previous values.</td></tr>
+      <tr><td>useReducer</td><td>For state with many transitions; reducer logic is easy to test.</td></tr>
+      <tr><td>useTransition / useDeferredValue</td><td>Mark updates as non-urgent so typing stays responsive while heavy UI updates.</td></tr>
+    </tbody></table></div>
+<pre><code>// A data-fetching effect with cleanup that avoids race conditions
+useEffect(() =&gt; {
+  const ctrl = new AbortController();
+  fetch(`/api/search?q=${encodeURIComponent(q)}`, { signal: ctrl.signal })
+    .then(r =&gt; r.json()).then(setResults)
+    .catch(e =&gt; { if (e.name !== "AbortError") setError(e); });
+  return () =&gt; ctrl.abort();          // a newer query cancels the older request
+}, [q]);</code></pre>
+  <h3>Modern React</h3>
+  <ul class="pts">
+    <li><b>Concurrent rendering:</b> React can pause and resume rendering, so urgent updates (typing) interrupt non-urgent ones.</li>
+    <li><b>Suspense:</b> declarative loading states for code splitting and data. Error boundaries handle failures.</li>
+    <li><b>Server Components:</b> run only on the server (direct data access, zero client JS); Client Components (<code>"use client"</code>) handle interactivity. Server Actions handle mutations.</li>
+    <li><b>React Compiler</b> memoizes automatically, reducing manual <code>useMemo</code>/<code>useCallback</code>.</li>
+  </ul>
+  <h3>Common bugs interviewers look for</h3>
+  <ul class="pts">
+    <li>Stale closures in effects or intervals (missing dependencies).</li>
+    <li>Using an effect to compute derived state, causing an extra render.</li>
+    <li>Index keys in reorderable lists, causing state to attach to the wrong row.</li>
+    <li>Mutating state directly (<code>arr.push</code>) so React doesn't see a change.</li>
+  </ul>
+  <div class="links"><a class="watch" href="https://react.dev/learn/you-might-not-need-an-effect" target="_blank" rel="noopener">react.dev: You Might Not Need an Effect</a><a class="watch" href="https://react.dev/reference/react" target="_blank" rel="noopener">React reference</a></div>
+</article>
+
+<article class="topic" id="fe-d-perf" data-t="Web performance in depth">
+  <p class="eyebrow">Deep dive</p><h2>Web performance in depth</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Problem</th><th>Fixes</th></tr></thead>
+    <tbody>
+      <tr><td>Slow LCP</td><td>Fast server response / CDN, preload the hero image with <code>fetchpriority="high"</code>, responsive images (AVIF/WebP, <code>srcset</code>), no lazy-loading above the fold, less render-blocking CSS/JS.</td></tr>
+      <tr><td>Poor INP</td><td>Break long tasks (yield with <code>scheduler.yield()</code> or <code>setTimeout</code>), less JS on the main thread, Web Workers for heavy work, <code>useTransition</code>, avoid layout thrashing.</td></tr>
+      <tr><td>High CLS</td><td>Width/height or <code>aspect-ratio</code> on media, reserved slots for ads and embeds, <code>font-display</code> with matched fallback metrics, no content inserted above existing content.</td></tr>
+      <tr><td>Big bundles</td><td>Route-level code splitting, dynamic <code>import()</code>, tree shaking, dropping heavy dependencies, bundle analysis.</td></tr>
+      <tr><td>Long lists</td><td>Virtualization (react-window, TanStack Virtual): render only visible rows.</td></tr>
+      <tr><td>Repeat visits</td><td>HTTP caching with content-hashed filenames (<code>Cache-Control: immutable</code>), CDN, service worker caching.</td></tr>
+    </tbody></table></div>
+<pre><code>&lt;!-- hero image: discovered early, high priority, right size --&gt;
+&lt;link rel="preload" as="image" href="/hero-1200.avif" fetchpriority="high"&gt;
+&lt;img src="/hero-1200.avif" srcset="/hero-600.avif 600w, /hero-1200.avif 1200w"
+     sizes="(max-width: 600px) 100vw, 1200px" width="1200" height="600" alt="Spring collection"&gt;
+
+&lt;!-- below the fold: lazy --&gt;
+&lt;img src="/gallery-1.webp" loading="lazy" decoding="async" width="400" height="300" alt="…"&gt;</code></pre>
+  <div class="links"><a class="watch" href="https://web.dev/learn/performance" target="_blank" rel="noopener">web.dev: Learn Performance</a><a class="watch" href="https://pagespeed.web.dev/" target="_blank" rel="noopener">PageSpeed Insights</a></div>
+</article>
+
+<article class="topic" id="fe-d-arch" data-t="Rendering &amp; architecture">
+  <p class="eyebrow">Deep dive</p><h2>Rendering strategies &amp; frontend architecture</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Strategy</th><th>First content</th><th>Interactive</th><th>Freshness</th><th>Good for</th></tr></thead>
+    <tbody>
+      <tr><td>CSR</td><td>Slow (after JS)</td><td>Same time as content</td><td>Live</td><td>Apps behind login, dashboards</td></tr>
+      <tr><td>SSR</td><td>Fast</td><td>After hydration</td><td>Per request</td><td>Dynamic, SEO-critical pages</td></tr>
+      <tr><td>SSG</td><td>Fastest (CDN)</td><td>After hydration</td><td>Build time</td><td>Docs, marketing, blogs</td></tr>
+      <tr><td>ISR</td><td>Fastest (CDN)</td><td>After hydration</td><td>Revalidated periodically or on demand</td><td>Catalogs, large content sites</td></tr>
+      <tr><td>Streaming SSR + Server Components</td><td>Fast, progressive</td><td>Progressive</td><td>Per request</td><td>Mixed pages with slow data sections</td></tr>
+      <tr><td>Islands</td><td>Fast</td><td>Only interactive parts hydrate</td><td>Varies</td><td>Content sites with a few widgets</td></tr>
+    </tbody></table></div>
+  <h3>Architecture topics</h3>
+  <ul class="pts">
+    <li><b>Design systems:</b> shared tokens (colour, spacing, type), accessible components, documentation (Storybook), and versioning.</li>
+    <li><b>Monorepos</b> (Turborepo, Nx, pnpm workspaces): shared packages, consistent tooling, cached builds.</li>
+    <li><b>Micro-frontends:</b> independently deployed parts of one UI (Module Federation, route-based splits). Useful for many teams; costs in consistency, bundle duplication and complexity.</li>
+    <li><b>BFF (backend for frontend):</b> an API layer shaped for one client, aggregating services and keeping secrets server-side.</li>
+  </ul>
+</article>
+
+<article class="topic" id="fe-d-a11y" data-t="Accessibility in depth">
+  <p class="eyebrow">Deep dive</p><h2>Accessibility in depth</h2>
+  <h3>Building an accessible modal</h3>
+  <ol class="steps">
+    <li>Use <code>&lt;dialog&gt;</code> with <code>showModal()</code> (or <code>role="dialog"</code> + <code>aria-modal="true"</code>) with an accessible name (<code>aria-labelledby</code>).</li>
+    <li>Move focus into the dialog on open, keep Tab cycling inside it, close on Escape, and return focus to the trigger on close.</li>
+    <li>Make the background inert (<code>inert</code> attribute) so screen readers and Tab skip it.</li>
+  </ol>
+  <h3>Common custom widgets and their patterns</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Widget</th><th>Key requirements</th></tr></thead>
+    <tbody>
+      <tr><td>Tabs</td><td><code>role="tablist/tab/tabpanel"</code>, arrow keys move between tabs, <code>aria-selected</code>.</td></tr>
+      <tr><td>Combobox / autocomplete</td><td><code>role="combobox"</code>, <code>aria-expanded</code>, <code>aria-controls</code>, <code>aria-activedescendant</code>, arrow keys and Enter, a live region for result counts.</td></tr>
+      <tr><td>Accordion</td><td>Buttons with <code>aria-expanded</code> controlling regions.</td></tr>
+      <tr><td>Toast / status</td><td><code>role="status"</code> or <code>aria-live="polite"</code> so screen readers announce it.</td></tr>
+    </tbody></table></div>
+  <h3>Testing</h3>
+  <ul class="pts">
+    <li>Automated: axe (browser extension, jest-axe, Playwright), Lighthouse. These catch only about a third of issues.</li>
+    <li>Manual: keyboard-only pass, a screen reader (VoiceOver, NVDA), zoom to 200%, and reduced motion.</li>
+  </ul>
+  <div class="links"><a class="watch" href="https://www.w3.org/WAI/ARIA/apg/patterns/" target="_blank" rel="noopener">ARIA Authoring Practices patterns</a><a class="watch" href="https://www.w3.org/WAI/WCAG22/quickref/" target="_blank" rel="noopener">WCAG 2.2 quick reference</a></div>
+</article>
+
+<article class="topic" id="fe-d-sec" data-t="Frontend security in depth">
+  <p class="eyebrow">Deep dive</p><h2>Frontend security in depth</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Threat</th><th>Defense</th></tr></thead>
+    <tbody>
+      <tr><td>XSS (stored, reflected, DOM-based)</td><td>Framework escaping, no raw HTML from users (or sanitize with DOMPurify), strict CSP with nonces, Trusted Types.</td></tr>
+      <tr><td>CSRF</td><td>SameSite=Lax/Strict cookies, CSRF tokens for state-changing requests, checking the Origin header.</td></tr>
+      <tr><td>Token theft</td><td>HttpOnly cookies instead of localStorage, short-lived tokens, refresh rotation.</td></tr>
+      <tr><td>Clickjacking</td><td><code>Content-Security-Policy: frame-ancestors 'self'</code> (or X-Frame-Options).</td></tr>
+      <tr><td>Supply chain</td><td>Lockfiles, dependency audits, Subresource Integrity for third-party scripts, minimal dependencies.</td></tr>
+      <tr><td>Open redirects</td><td>Allow-list redirect targets.</td></tr>
+      <tr><td>Secrets in bundles</td><td>Anything in client JS is public. Keep keys server-side or in a BFF.</td></tr>
+    </tbody></table></div>
+<pre><code>Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-r4nd0m'; img-src 'self' https://cdn.example.com;
+                         object-src 'none'; base-uri 'self'; frame-ancestors 'self'
+Set-Cookie: session=…; HttpOnly; Secure; SameSite=Lax; Path=/</code></pre>
+</article>
+
+<article class="topic" id="fe-d-test" data-t="Testing &amp; tooling">
+  <p class="eyebrow">Deep dive</p><h2>Testing &amp; tooling</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Layer</th><th>Tools</th><th>Test</th></tr></thead>
+    <tbody>
+      <tr><td>Unit</td><td>Vitest, Jest</td><td>Pure functions, hooks, reducers</td></tr>
+      <tr><td>Component</td><td>Testing Library</td><td>Render, interact the way a user would (by role and label), assert on visible output</td></tr>
+      <tr><td>End to end</td><td>Playwright, Cypress</td><td>Critical flows in real browsers (sign-up, checkout)</td></tr>
+      <tr><td>Visual</td><td>Chromatic, Playwright screenshots, Percy</td><td>Unintended UI changes</td></tr>
+      <tr><td>Mocking network</td><td>MSW (Mock Service Worker)</td><td>Realistic API responses in tests and local dev</td></tr>
+    </tbody></table></div>
+<pre><code>test("shows results for a search", async () =&gt; {
+  render(&lt;Search /&gt;);
+  await userEvent.type(screen.getByRole("combobox", { name: /search/i }), "lamp");
+  expect(await screen.findByRole("option", { name: /desk lamp/i })).toBeInTheDocument();
+});</code></pre>
+  <p>Tooling worth naming: Vite (dev server and build), TypeScript, ESLint, Prettier, and bundle analyzers.</p>
+</article>
+
+<article class="topic" id="fe-d-case" data-t="Case study: autocomplete">
+  <p class="eyebrow">Deep dive</p><h2>Case study: design an autocomplete component</h2>
+  <p class="lead">"Design a search autocomplete like Google's, used across many pages of a large site." The most common frontend system design question.</p>
+  <h3>Requirements</h3>
+  <ul class="pts">
+    <li><b>Functional:</b> suggestions as you type, keyboard navigation, select by click or Enter, highlight matched text, recent searches when empty.</li>
+    <li><b>Non-functional:</b> results under ~150 ms after typing stops, works on slow networks and mobile, fully accessible, reusable with a customizable result rendering.</li>
+  </ul>
+  <h3>Architecture</h3>
+  <div class="widget"><div class="whead"><span class="wtitle">Diagram · autocomplete component</span></div><div class="chartwrap" id="dg-fe-auto"></div></div>
+  <h3>Key decisions</h3>
+  <ul class="pts">
+    <li><b>Debounce</b> input (~200 ms), and <b>cancel</b> in-flight requests with AbortController so a slow old response can't overwrite a newer one (or track a request ID and ignore stale responses).</li>
+    <li><b>Cache</b> results per query in memory (an LRU map) so backspacing is instant. Optionally prefetch popular prefixes.</li>
+    <li><b>Accessibility:</b> combobox pattern with <code>aria-expanded</code>, <code>aria-activedescendant</code> on the input, options with <code>role="option"</code>, and a live region announcing "5 results".</li>
+    <li><b>API:</b> <code>GET /suggest?q=lam&amp;limit=8</code> returning IDs, text and highlight ranges. Rendering stays in the component, with a render prop or slot for custom rows.</li>
+    <li><b>Edge cases:</b> empty and whitespace queries, no results, errors (keep the last good results), very long text, IME composition (don't search mid-composition), mobile keyboards.</li>
+    <li><b>Performance:</b> virtualize if the list can be long, and avoid re-rendering the whole list on highlight change.</li>
+  </ul>
+  <h3>Senior follow-ups</h3>
+</article>
+
+<article class="topic" id="fe-d-feed" data-t="Case study: news feed">
+  <p class="eyebrow">Deep dive</p><h2>Case study: design a news feed web app</h2>
+  <p class="lead">"Design the web client for a social news feed: infinite scroll, posts with media, likes and comments, real-time updates."</p>
+  <h3>Architecture</h3>
+  <div class="widget"><div class="whead"><span class="wtitle">Diagram · news feed web client</span></div><div class="chartwrap" id="dg-fe-feed"></div></div>
+  <h3>Key decisions</h3>
+  <ul class="pts">
+    <li><b>Rendering:</b> SSR (or streaming) for the first page so content appears fast and is indexable, then client-side navigation and data fetching.</li>
+    <li><b>Data:</b> cursor-based pagination through TanStack Query's infinite queries, a <b>normalized cache</b> (posts by ID, so a like updates every place the post appears), and optimistic likes with rollback.</li>
+    <li><b>Infinite scroll:</b> IntersectionObserver on a sentinel near the bottom to fetch the next page, and <b>virtualization</b> once the list is long, keeping DOM size bounded. Preserve the scroll position on back navigation.</li>
+    <li><b>Media:</b> responsive images with known dimensions (no CLS), lazy loading below the fold, and videos that autoplay muted only when visible.</li>
+    <li><b>Real-time:</b> a WebSocket or SSE channel for new posts; show a "new posts" button rather than shifting content under the reader.</li>
+    <li><b>Accessibility:</b> the feed pattern (<code>role="feed"</code>, <code>aria-busy</code> while loading), keyboard navigation between posts, and announcements for new content.</li>
+    <li><b>Observability:</b> Web Vitals from real users, error tracking (Sentry), and impression analytics batched with <code>navigator.sendBeacon</code>.</li>
+  </ul>
+  <h3>Senior follow-ups</h3>
+</article>
+
+</div></div>
+</div><!-- /fe-deep -->
+</div><!-- /s-fe -->
+
 <!-- BEHAVIORAL & LEADERSHIP                                -->
 <!-- ===================================================== -->
 <div class="subject" id="s-bl" data-s="bl" data-name="Behavioral &amp; Leadership" hidden>
@@ -9395,6 +10009,145 @@ const MB_IQ={
 };
 Object.assign(IQ,MB_IQ);
 
+// =================== FRONTEND ENGINEERING ===================
+// rendering pipeline
+const CRP=['HTML → DOM','CSS → CSSOM','Render tree','Layout','Paint','Composite'];
+const CRPF=[[0,[],'',`The browser receives HTML and starts parsing it into the <b>DOM</b>. A plain &lt;script&gt; would pause parsing here, so use defer.`],
+ [1,[0],'',`CSS becomes the <b>CSSOM</b>. CSS is render-blocking: nothing paints until it's ready, so keep critical CSS small.`],
+ [2,[0,1],'',`DOM + CSSOM = <b>render tree</b> (only visible nodes, with computed styles).`],
+ [3,[0,1,2],'',`<b>Layout</b> computes every box's size and position.`],[4,[0,1,2,3],'',`<b>Paint</b> fills pixels into layers (text, colours, images, shadows).`],
+ [5,[0,1,2,3,4],'',`<b>Composite</b>: the GPU stacks the layers into the final frame. The page is visible.`],
+ [-1,[3,4,5],'el.style.width = "300px"',`Changing <b>geometry</b> re-runs layout → paint → composite for affected elements. Doing it every frame is expensive.`],
+ [-1,[5],'el.style.transform = "translateX(300px)"',`Changing <b>transform</b> or <b>opacity</b> can skip layout and paint entirely, so it's composite-only and runs smoothly on the GPU. That's why animations should use them.`]];
+player('w-fe-crp',()=>CRPF.map(x=>({cur:x[0],done:x[1],code:x[2],msg:x[3]})),
+ f=>'<div class="pipe">'+CRP.map((c,i)=>'<span class="stg '+(f.cur===-1?(f.done.includes(i)?'run':'skip'):f.done.includes(i)?'ok':i===f.cur?'run':'')+'">'+c+'</span>'+(i<5?'<span class="lk">→</span>':'')).join('')+'</div>'+(f.code?codeview([f.code],[0]):''));
+
+// event loop
+const EL_CODE=["console.log('1');","setTimeout(() => console.log('2'), 0);","Promise.resolve().then(() => console.log('3'));","queueMicrotask(() => console.log('4'));","console.log('5');"];
+const ELF=[[-1,[],[],[],[],'Predict the output before stepping through. Many candidates say 1 2 3 4 5.'],
+ [0,['main()','log("1")'],[],[],['1'],'Synchronous code runs on the <b>call stack</b>. Prints 1.'],
+ [1,['main()','setTimeout'],[],['log 2'],['1'],'setTimeout hands the timer to the browser. After 0 ms its callback joins the <b>task queue</b>. It doesn\'t run now.'],
+ [2,['main()','then()'],['log 3'],['log 2'],['1'],'The promise is already resolved, so its callback joins the <b>microtask queue</b>.'],
+ [3,['main()','queueMicrotask'],['log 3','log 4'],['log 2'],['1'],'Another <b>microtask</b>.'],
+ [4,['main()','log("5")'],['log 3','log 4'],['log 2'],['1','5'],'Still synchronous. Prints 5.'],
+ [-1,['log 3'],['log 4'],['log 2'],['1','5','3'],'The script finished and the stack is empty. Now the loop drains <b>all microtasks</b> first. Prints 3.'],
+ [-1,['log 4'],[],['log 2'],['1','5','3','4'],'Prints 4. The microtask queue is now empty.'],
+ [-1,['log 2'],[],[],['1','5','3','4','2'],'Only then (after a possible render) does the next <b>task</b> run. Prints 2. Final: <b>1 5 3 4 2</b>.']];
+player('w-fe-loop',()=>ELF.map(x=>({ln:x[0],st:x[1],mi:x[2],ta:x[3],out:x[4],msg:x[5]})),
+ f=>'<div class="row" style="align-items:flex-start;width:100%">'+codeview(EL_CODE,[f.ln])+'</div><div class="row" style="align-items:stretch;width:100%">'+
+  [['Call stack',f.st],['Microtask queue',f.mi],['Task queue',f.ta]].map(([t,a])=>'<div class="thr'+(a.length?' on':'')+'"><b>'+t+'</b>'+(a.length?a.map(x=>'<span class="pod">'+x+'</span>').join(''):'<span class="empty">empty</span>')+'</div>').join('')+
+  '</div><div class="kvs"><span class="note">console:</span>'+(f.out.length?f.out.map(o=>'<span class="kv hit">'+o+'</span>').join(''):'<span class="empty">nothing yet</span>')+'</div>');
+
+// closures in loops
+let cloMode='var';
+const cloP=player('w-fe-closure',()=>{const V=cloMode==='var';const F=[{b:[],t:[],out:[],msg:'<code>for ('+cloMode+' i = 0; i &lt; 3; i++) setTimeout(() =&gt; console.log(i));</code> What gets printed?'}];
+  for(let i=0;i<3;i++)F.push({b:V?[['i',i]]:[...Array(i+1)].map((_,k)=>['i (iteration '+k+')',k]),t:[...Array(i+1)].map((_,k)=>V?'callback '+k+' → shared i':'callback '+k+' → its own i'),out:[],msg:V?'Iteration '+i+': <code>var</code> has <b>one</b> function-scoped <code>i</code>. Each callback closes over that same variable.':'Iteration '+i+': <code>let</code> creates a <b>fresh binding</b> per iteration, so each callback captures its own <code>i</code>.'});
+  F.push({b:V?[['i',3]]:[0,1,2].map(k=>['i (iteration '+k+')',k]),t:['callback 0','callback 1','callback 2'],out:[],msg:V?'The loop ends with the shared <code>i = 3</code>. The callbacks haven\'t run yet: they\'re tasks waiting in the queue.':'The loop ends. Three separate bindings hold 0, 1 and 2.'});
+  F.push({b:F[F.length-1].b,t:[],out:V?['3','3','3']:['0','1','2'],msg:V?'The timers fire and read the shared <code>i</code>: <b>3 3 3</b>. Fix it with <code>let</code>, or by passing <code>i</code> as an argument.':'The timers fire, each reading its own binding: <b>0 1 2</b>.'});return F;},
+ f=>'<div class="row" style="align-items:stretch;width:100%"><div class="thr on"><b>Variables (bindings)</b>'+(f.b.length?f.b.map(b=>'<span class="pod">'+b[0]+' = '+b[1]+'</span>').join(''):'<span class="empty">none yet</span>')+'</div><div class="thr'+(f.t.length?' on':'')+'"><b>Queued timers</b>'+(f.t.length?f.t.map(t=>'<span class="pod v2">'+t+'</span>').join(''):'<span class="empty">empty</span>')+'</div></div><div class="kvs"><span class="note">console:</span>'+(f.out.length?f.out.map(o=>'<span class="kv hit">'+o+'</span>').join(''):'<span class="empty">nothing yet</span>')+'</div>');
+modeSwitch('clo-mode',m=>{cloMode=m;cloP.rebuild();});
+
+// DOM event propagation
+const EVP=['window','document','html','body','ul.list  ← delegated listener','li data-id="7"','button[data-action="delete"]'];
+player('w-fe-events',()=>{const F=[{k:-1,ph:'',msg:'The user clicks the delete button inside list item 7.'}];
+  for(let i=0;i<6;i++)F.push({k:i,ph:'capture',msg:'<b>Capture phase</b>: the event travels down through <code>'+EVP[i].split(' ')[0]+'</code>. Only capture listeners run here.'});
+  F.push({k:6,ph:'target',msg:'<b>Target phase</b> at the button itself.'});
+  for(let i=5;i>=4;i--)F.push({k:i,ph:'bubble',msg:i===4?'<b>Bubble phase</b> reaches <code>ul.list</code>, where the <b>delegated listener</b> runs: <code>e.target.closest("button")</code> finds the button and deletes item 7. One listener serves every row, including rows added later.':'<b>Bubble phase</b>: the event travels back up through <code>li</code>.'});
+  F.push({k:3,ph:'bubble',msg:'It keeps bubbling to body, document and window, unless a handler called <code>stopPropagation()</code>. (<code>preventDefault()</code> is different: it cancels the browser\'s default action.)'});return F;},
+ f=>'<div class="tree">'+EVP.map((n,i)=>'<div class="tn2'+(i===f.k?' cur':'')+'" style="margin-left:'+(i*18)+'px;font-family:var(--f-mono);font-size:.8rem"><small>'+(i===f.k?f.ph+' phase':'')+'</small>'+n+'</div>').join('')+'</div>');
+
+// React re-render
+let reactMode='plain';
+const RT=[['App',0,'state: cart'],['Header',1,''],['ProductList',1,'props: products, onAdd'],['Item ×1',2,''],['Item ×2',2,''],['Item ×3',2,''],['Cart',1,'props: items']];
+const reactP=player('w-fe-react',()=>{const M=reactMode==='memo';return [
+  {r:[],c:[],msg:'The user clicks "Add to cart". That calls <code>setCart</code> in <b>App</b>.'},
+  {r:[0],c:[],msg:'App re-renders because its state changed.'},
+  {r:M?[0,1,6]:[0,1,2,3,4,5,6],s:M?[2,3,4,5]:[],c:[],msg:M?'<b>ProductList</b> is wrapped in <code>React.memo</code> and its props are the same objects as last time (<code>products</code> unchanged, <code>onAdd</code> stable via useCallback), so React <b>skips</b> it and all its Items. Only Header and Cart render.':'By default, re-rendering App re-renders <b>every child</b>, including ProductList and all its Items, even though their props didn\'t change.'},
+  {r:M?[0,1,6]:[0,1,2,3,4,5,6],s:M?[2,3,4,5]:[],c:[6],msg:'<b>Commit:</b> React diffs the new elements against the old ones. Only <b>Cart</b>\'s DOM actually changes. Rendering (calling components) isn\'t the same as updating the DOM. '+(M?'Memo saved the render work for 4 components.':'Unnecessary renders cost CPU, which matters for big lists. Measure with the React Profiler before adding memo.')}];},
+ f=>'<div class="tree">'+RT.map((n,i)=>'<div class="tn2'+((f.c||[]).includes(i)?' cur':'')+'" style="margin-left:'+(n[1]*24)+'px;'+((f.s||[]).includes(i)?'opacity:.35':'')+'"><small>'+((f.c||[]).includes(i)?'DOM updated':(f.r||[]).includes(i)?'re-rendered':(f.s||[]).includes(i)?'skipped (memo)':'')+'</small><b>'+n[0]+'</b> <span class="note">'+n[2]+'</span></div>').join('')+'</div>');
+modeSwitch('react-mode',m=>{reactMode=m;reactP.rebuild();});
+
+// state placement
+const FS=[['Is this dropdown open?','useState (local)','Only this component cares. Keep it local.'],['Products loaded from the API','Server-state cache','TanStack Query / SWR: caching, refetching, de-duplication. It\'s a cache of server data, not app state.'],
+ ['Search filters and current page','URL query params','Shareable, bookmarkable, and they survive a refresh. The back button works.'],['Logged-in user and theme','Context','Read by many components, rarely changes.'],['A complex document editor\'s state','Store (Zustand / Redux)','Frequent updates shared across many components, with devtools and predictable updates.']];
+player('w-fe-state',()=>[{k:0,msg:'Five pieces of state. Put each in the simplest place that works.'},...FS.map((x,i)=>({k:i+1,msg:'<b>'+x[1]+'</b>: '+x[2]}))],
+ f=>'<div class="dash">'+FS.map((x,i)=>'<div class="dcard"'+(i===f.k-1?' style="border-color:var(--hl)"':'')+'><p style="margin:0">'+x[0]+'</p>'+(i<f.k?'<span class="tag good" style="align-self:flex-start">'+x[1]+'</span>':'<span class="tag info" style="align-self:flex-start">?</span>')+'</div>').join('')+'</div>');
+
+// web vitals timeline
+const VB=[['TTFB',600],['FCP',1400],['LCP',3900],['CLS shift',4300],['INP click',6100]],VA=[['TTFB',150],['FCP',700],['LCP',1700],['INP click',6100]];
+player('w-fe-vitals',()=>[{v:'b',k:0,msg:'A product page on a mid-range phone over 4G. Watch the key moments.'},
+  {v:'b',k:1,msg:'<b>TTFB 600 ms</b>: the server is slow to send the first byte (no CDN caching of the HTML).'},
+  {v:'b',k:2,msg:'<b>FCP 1.4 s</b>: first text appears, held back by render-blocking CSS and JS.'},
+  {v:'b',k:3,msg:'<b>LCP 3.9 s</b> (poor, target &lt; 2.5 s): the hero image was lazy-loaded and discovered late.'},
+  {v:'b',k:4,msg:'<b>CLS 0.24</b> (poor, target &lt; 0.1): an ad slot without reserved space pushed the content down.'},
+  {v:'b',k:5,msg:'<b>INP 380 ms</b> (needs improvement, target &lt; 200 ms): "Add to cart" ran a 350 ms task on the main thread.'},
+  {v:'a',k:4,msg:'<b>After:</b> CDN-cached HTML (TTFB 150 ms), inlined critical CSS and deferred JS (FCP 0.7 s), the hero image preloaded with fetchpriority=high (<b>LCP 1.7 s</b>), a reserved ad slot (<b>CLS 0.02</b>), and the heavy work split up with a yield (<b>INP 90 ms</b>). All green.'}],
+ f=>{const L=(f.v==='b'?VB:VA).slice(0,f.k),W=560,X=t=>20+t/7000*(W-40);let s='<svg viewBox="0 0 '+W+' 90" width="'+W+'" style="max-width:100%;height:auto" role="img" aria-label="page load timeline"><line class="axis" x1="20" x2="'+(W-20)+'" y1="50" y2="50"/>';
+   [0,2000,4000,6000].forEach(t=>{s+='<text class="tick" x="'+X(t)+'" y="80" text-anchor="middle">'+t/1000+' s</text>';});
+   L.forEach((m,i)=>{const bad=f.v==='b'&&['LCP','CLS shift','INP click'].includes(m[0]);s+='<line x1="'+X(m[1])+'" x2="'+X(m[1])+'" y1="'+(i%2?22:30)+'" y2="50" style="stroke:var('+(bad?'--bad':'--ok')+');stroke-width:2"/><circle cx="'+X(m[1])+'" cy="50" r="5" style="fill:var('+(bad?'--bad':'--ok')+')"/><text class="tick" x="'+X(m[1])+'" y="'+(i%2?16:24)+'" text-anchor="middle" style="fill:var(--ink);font-weight:600">'+m[0]+'</text>';});
+   const met=f.v==='b'?[['LCP','3.9 s',1],['INP','380 ms',1],['CLS','0.24',1]]:[['LCP','1.7 s',0],['INP','90 ms',0],['CLS','0.02',0]];
+   return s+'</svg>'+(f.k>=3||f.v==='a'?'<div class="metrics">'+met.map(m=>'<div class="metric'+(m[2]?' bad':'')+'">'+m[0]+'<b>'+m[1]+'</b></div>').join('')+'</div>':'');});
+
+// rendering strategies
+const RS={CSR:[['HTML shell',100,'--dim'],['Download JS',800,'--c4'],['Fetch data',600,'--c2'],['Render',200,'--ok']],SSR:[['Server: data + render',500,'--c2'],['HTML arrives',150,'--ok'],['Download JS',700,'--c4'],['Hydrate',300,'--accent']],SSG:[['CDN serves HTML',80,'--ok'],['Download JS',700,'--c4'],['Hydrate',300,'--accent']]};
+const RSI={CSR:[1700,1700],SSR:[650,1650],SSG:[80,1080]};
+player('w-fe-ssr',()=>[{s:'CSR',msg:'<b>CSR:</b> the user stares at a blank shell until JS downloads, runs, and fetches data. Content and interactivity both arrive at about <b>1.7 s</b>.'},
+  {s:'SSR',msg:'<b>SSR:</b> the server fetches data and sends finished HTML, so content is visible at about <b>0.65 s</b>. It becomes interactive after hydration at about 1.65 s. In between, clicks may not work yet (the "uncanny valley").'},
+  {s:'SSG',msg:'<b>SSG:</b> pre-built HTML straight from the CDN: content at about <b>0.08 s</b>, interactive at about 1.1 s. But the content is only as fresh as the last build (ISR refreshes it periodically).'},
+  {s:'SSG',sum:1,msg:'Pick per page. Streaming SSR and Server Components shrink the hydration gap by sending less JS, and islands hydrate only the interactive widgets.'}],
+ f=>{const L=RS[f.s],S=2000,[vis,int]=RSI[f.s];return '<p class="note"><b>'+f.s+'</b></p><div class="tl">'+L.map(x=>'<div style="width:'+(x[1]/S*100)+'%;background:var('+x[2]+')">'+(x[1]>=250?x[0]:'')+'</div>').join('')+'</div><div class="metrics"><div class="metric">Content visible<b>'+vis+' ms</b></div><div class="metric">Interactive<b>'+int+' ms</b></div></div>'+
+   (f.sum?'<table class="mini"><tr><th>strategy</th><th>visible</th><th>interactive</th></tr>'+Object.entries(RSI).map(([k,v])=>'<tr><td>'+k+'</td><td>'+v[0]+' ms</td><td>'+v[1]+' ms</td></tr>').join('')+'</table>':'');});
+
+// keyboard focus / a11y
+const PG=['Skip to content','Logo (link)','Search input','Nav: Products','Nav: Pricing','"Open settings" button','div onClick="buy()" (not focusable!)','Footer: Contact'],MD=['Dialog title: Settings','Close button','Display name input','Save button'];
+player('w-fe-a11y',()=>{const F=[{p:-1,m:-1,open:0,msg:'Navigate with Tab only, as keyboard and screen-reader users do.'}];
+  [0,1,2,3,4].forEach(i=>F.push({p:i,m:-1,open:0,msg:'Tab → <b>'+PG[i]+'</b>.'+(i===0?' A skip link lets keyboard users jump past repeated navigation.':'')}));
+  F.push({p:5,m:-1,open:0,msg:'Tab → <b>Open settings</b>. Note what comes next…'});
+  F.push({p:6,m:-1,open:0,skip:1,msg:'The "buy" <code>&lt;div onClick&gt;</code> is <b>skipped</b>: it isn\'t focusable and has no role, so keyboard users can\'t buy. Use a real <code>&lt;button&gt;</code>.'});
+  F.push({p:5,m:0,open:1,msg:'Enter on "Open settings": the modal opens and <b>focus moves into it</b>. The background is made inert.'});
+  [1,2,3].forEach(i=>F.push({p:5,m:i,open:1,msg:'Tab → <b>'+MD[i]+'</b> (focus stays trapped in the dialog).'}));
+  F.push({p:5,m:1,open:1,msg:'Tab from the last element <b>wraps</b> to the first. It never escapes to the page behind.'});
+  F.push({p:5,m:-1,open:0,msg:'Escape closes the dialog and <b>focus returns to "Open settings"</b>, so the user doesn\'t lose their place.'});return F;},
+ f=>'<div class="row" style="align-items:stretch;width:100%"><div class="thr'+(f.open?' wait':'')+'" style="'+(f.open?'opacity:.5':'')+'"><b>Page</b>'+PG.map((x,i)=>'<span class="pod'+(i===f.p&&!f.open?' new':'')+'" style="'+(i===f.p&&!f.open?'outline:3px solid var(--accent)':'')+(i===6?';border-color:var(--bad)':'')+'">'+x+(i===6&&f.skip?' ✕':'')+'</span>').join('')+'</div>'+
+  '<div class="thr'+(f.open?' on':'')+'" style="'+(f.open?'':'opacity:.35')+'"><b>Modal dialog</b>'+MD.map((x,i)=>'<span class="pod" style="'+(i===f.m&&f.open?'outline:3px solid var(--accent)':'')+'">'+x+'</span>').join('')+'</div></div>');
+
+// CORS preflight
+linePlayer('w-fe-cors',`The page at https://app.example calls an API on another origin, https://api.other.com.`,[
+ ['Browser',`<code>fetch("https://api.other.com/items/7", {method: "PUT", headers: {"Content-Type": "application/json"}})</code>`,`A PUT with a JSON body isn't a "simple" request, so the browser checks permission first.`],
+ ['Preflight →',`<code>OPTIONS /items/7</code> with <code>Origin: https://app.example</code>, <code>Access-Control-Request-Method: PUT</code>, <code>Access-Control-Request-Headers: content-type</code>`,`The browser sends the <b>preflight</b> automatically. Your code never sees it.`],
+ ['← Server',`<code>204</code> with <code>Access-Control-Allow-Origin: https://app.example</code>, <code>Allow-Methods: PUT</code>, <code>Allow-Headers: content-type</code>, <code>Max-Age: 600</code>`,`The server allows this origin, method and header, and the answer is cached for 10 minutes.`],
+ ['Request →',`The actual <code>PUT /items/7</code> is sent with the JSON body (and cookies only if <code>credentials: "include"</code> plus <code>Allow-Credentials: true</code>).`,`Now the real request goes out.`],
+ ['← Response',`<code>200</code> with <code>Access-Control-Allow-Origin: https://app.example</code>, so the page can read the response.`,`Success.`],
+ ['If not allowed',`Without the right headers, the browser <b>blocks the page from reading the response</b>, and you see a CORS error in the console.`,`CORS is enforced by the browser to protect users. It isn't API security: curl ignores it, so the server still needs authentication.`]]);
+
+// diagrams
+diagram('dg-fe-arch',800,300,[ND('u',70,150,'User','browser',''),ND('ui',235,150,'UI components','design system','acc',150),ND('st',430,55,'Client state','URL · store','',150),ND('qc',430,150,'Server-state cache','TanStack Query','',170),ND('sw',430,250,'Service worker','offline cache','',150),
+  ND('cdn',650,55,'CDN','JS · CSS · images','',150),ND('bff',650,150,'BFF / API','REST / GraphQL','acc',150),ND('mon',650,250,'Monitoring','Web Vitals · errors','hl',150)],
+  [['u','ui'],['ui','st'],['ui','qc'],['qc','bff','fetch'],['sw','cdn','cache',{dash:1}],['st','cdn','',{dash:1}],['ui','mon','RUM',{dash:1}]]);
+diagram('dg-fe-auto',700,290,[ND('in',90,145,'Input','debounce 200 ms','acc',140),ND('ct',300,145,'Controller','abort stale · cache','',160),ND('ca',300,255,'LRU cache','query → results','',150),ND('api',520,145,'Suggest API','/suggest?q=','',150),
+  ND('lb',300,40,'Listbox','role=listbox','',150),ND('lv',520,40,'Live region','"5 results"','hl',150)],
+  [['in','ct','query'],['ct','ca','hit?'],['ct','api','miss'],['ct','lb','results'],['lb','lv','',{dash:1}]]);
+diagram('dg-fe-feed',800,300,[ND('ssr',90,150,'SSR first page','streamed HTML','acc',150),ND('fd',290,150,'Feed list','virtualized · sentinel','',170),ND('qc',490,55,'Normalized cache','posts by id','',160),ND('api',690,55,'Feed API','cursor pages','',140),
+  ND('ws',490,250,'Realtime','WebSocket / SSE','',150),ND('md',690,150,'Media CDN','srcset · lazy','',140),ND('rum',690,250,'Analytics','sendBeacon · vitals','hl',140)],
+  [['ssr','fd','hydrate'],['fd','qc'],['qc','api','next page'],['ws','qc','new posts'],['fd','md','images'],['fd','rum','',{dash:1}]]);
+
+const FE_IQ={
+ 'fe-crp':[["What happens between receiving HTML and seeing pixels?","Parse HTML into the DOM (pausing for parser-blocking scripts), build the CSSOM (render-blocking), combine them into the render tree, compute layout, paint into layers, then composite on the GPU. Optimize with defer/async scripts, critical CSS, and fewer, smaller resources."],["Why animate transform and opacity instead of top/left or width?","Geometry changes trigger layout and paint every frame. Transform and opacity can be handled by the compositor alone (often on the GPU), so they stay smooth even when the main thread is busy."]],
+ 'fe-loop':[["Explain the event loop, and the difference between microtasks and tasks.","A single thread runs the call stack. When it empties, the loop runs all microtasks (promise callbacks, queueMicrotask), then may render, then takes the next task (timers, events, I/O). So promise callbacks always run before a setTimeout(0) queued earlier."],["Why does a long task hurt user experience?","While JavaScript runs, the main thread can't handle input or render. Tasks over 50 ms show up as poor INP. Break work into chunks (yield between them), move it to a Web Worker, or defer it."]],
+ 'fe-closure':[["What is a closure? Give a practical use.","A function together with the variables from the scope where it was created, which stay alive as long as the function does. Uses: data privacy (module pattern, counters), callbacks and handlers, memoization, debounce/throttle, and React hooks capturing props and state (the source of stale-closure bugs)."],["How is `this` determined?","By the call site: obj.method() → obj, plain call → undefined in strict mode (window in sloppy mode), new → the new instance, call/apply/bind → the given value. Arrow functions don't have their own this; they use the enclosing scope's."]],
+ 'fe-events':[["What is event delegation, and why use it?","Attach one listener to a common ancestor and use event.target (closest()) to find which child was clicked. It uses fewer listeners and less memory, and it works automatically for elements added later. It relies on events bubbling."],["stopPropagation vs preventDefault?","stopPropagation stops the event from travelling to other elements. preventDefault cancels the browser's default action (following a link, submitting a form, scrolling) but lets the event keep propagating."]],
+ 'fe-react':[["When does a React component re-render?","When its state changes, when its parent re-renders (by default, regardless of props), or when a context it reads changes. Re-rendering calls the component again; React then diffs the result and commits only real DOM changes."],["Why shouldn't you use array indexes as keys?","Keys tell React which item is which between renders. With index keys, inserting, removing or reordering items makes React reuse the wrong component instances, so state (input text, focus, animations) attaches to the wrong rows. Use stable IDs from the data."],["When do useMemo and useCallback actually help?","When the computation is genuinely expensive, or when a stable reference prevents re-renders of a memoized child or prevents effects from re-running. Elsewhere they add overhead and noise. Profile first, or let the React Compiler handle it."]],
+ 'fe-state':[["How do you decide where state should live?","Keep it as local as possible and lift it only when siblings need it. Server data goes in a server-state cache (TanStack Query, SWR), shareable view state in the URL, rarely-changing global values in Context, and complex, frequently-updated shared client state in a store. Derive values instead of duplicating them."]],
+ 'fe-vitals':[["What are Core Web Vitals, and how would you improve each?","LCP (main content visible, under 2.5 s): faster server/CDN, preload and size the hero image, less render-blocking resources. INP (interaction responsiveness, under 200 ms): break up long tasks, less JS, Web Workers. CLS (visual stability, under 0.1): set dimensions on media, reserve space for ads, avoid inserting content above existing content."],["Your bundle is 2 MB. What do you do?","Analyze it (bundle analyzer). Code-split by route and lazy-load heavy features, remove or replace large dependencies, ensure tree shaking works (ES modules, sideEffects flags), drop polyfills modern browsers don't need, and set a size budget in CI."]],
+ 'fe-ssr':[["SSR vs CSR vs SSG: when would you use each?","SSG/ISR for content that's the same for everyone (docs, marketing, catalogs): fastest, cached at the CDN. SSR for dynamic or personalized pages that need fast first paint or SEO. CSR for highly interactive apps behind login where SEO doesn't matter. Most real apps mix them per route."],["What is hydration, and what problems can it cause?","The client attaches event handlers and state to server-rendered HTML by running the components again. Until it finishes, the page looks ready but may not respond. Mismatches between server and client output cause warnings or re-renders. Reduce the cost with less client JS, Server Components, islands, and streaming."]],
+ 'fe-a11y':[["How would you make a custom dropdown accessible?","Prefer a native select if possible. Otherwise follow the ARIA listbox or combobox pattern: a button with aria-expanded and aria-controls, options with role=option and aria-selected, arrow keys, Enter and Escape, focus management, and a visible focus style. Test with a keyboard and a screen reader."],["Why is a div with onClick a problem?","It isn't focusable, has no role, and doesn't respond to Enter or Space, so keyboard and screen-reader users can't use it. A button gives all of that for free. Adding tabindex, role and key handlers to a div is reinventing the button, and is easy to get wrong."]],
+ 'fe-sec':[["How do you prevent XSS in a React app?","Rely on React's automatic escaping, avoid dangerouslySetInnerHTML (or sanitize with DOMPurify), never build URLs from user input without validating the scheme (javascript: URLs), add a strict CSP with nonces, and keep tokens in HttpOnly cookies so XSS can't read them."],["What is CORS, and what does it protect against?","A browser mechanism that blocks a page from reading responses from another origin unless that server opts in with Access-Control-Allow-Origin. Non-simple requests send an OPTIONS preflight first. It protects users from malicious sites reading their data, not your server from direct requests, which still need authentication."]],
+ 'fe-sysd':[["Walk me through your approach to a frontend system design question.","RADIO: clarify Requirements (features, devices, scale, accessibility, offline), sketch the component Architecture, define the client Data model and state, specify the Interfaces (API contracts and component props), then Optimizations: performance, rendering strategy, caching, accessibility, i18n, security, and monitoring."]],
+ 'fe-d-case':[["How do you stop a slow response from overwriting newer results?","Cancel the previous request with AbortController when a new query starts, or tag each request with an incrementing ID and ignore responses that aren't the latest. Also debounce input to reduce the number of requests."],["How would you make the autocomplete accessible?","Use the combobox pattern: the input has role=combobox, aria-expanded and aria-controls pointing at a listbox, and aria-activedescendant tracks the highlighted option. Arrow keys move through options, Enter selects, Escape closes, and a polite live region announces the result count."]],
+ 'fe-d-feed':[["How do you keep an infinite feed fast after hundreds of posts?","Virtualize the list so only visible rows (plus a buffer) are in the DOM, keep a normalized cache so updates touch one record, lazy-load media with known dimensions, and restore the scroll position on back navigation. Watch INP and memory over a long session."],["How would you show new posts in real time without disrupting reading?","Receive them over WebSocket or SSE into the cache, but don't insert them above the reader's position. Show a \"N new posts\" button that scrolls to the top and reveals them, and announce it politely for screen readers."]]
+};
+Object.assign(IQ,FE_IQ);
+
 // inject question blocks + rating controls; build the review bank
 const QB=[];
 Object.entries(IQ).forEach(([id,qs])=>{const sec=document.getElementById(id);if(!sec)return;
@@ -9443,7 +10196,7 @@ function rateQ(qid,r){const q=Object.assign({b:0},P.data.qs[qid]),now=Date.now()
 const qState=qid=>{const q=P.data.qs[qid];return !q?'new':q.b>=3?'mastered':'learning';};
 
 // dashboard
-const SUBJ_ORDER=['dsa','se','ds','sr','ai','mb','bl'];
+const SUBJ_ORDER=['dsa','se','ds','sr','ai','mb','fe','bl'];
 function renderDash(){const el=document.getElementById('prep-dash');if(!el)return;
   el.innerHTML=SUBJ_ORDER.map(s=>{const sj=document.getElementById('s-'+s),qs=QB.filter(q=>q.s===s),c={mastered:0,learning:0,new:0};qs.forEach(q=>c[qState(q.qid)]++);
     const ts=[...sj.querySelectorAll('.mark')].map(m=>P.data.topics[m.dataset.id]),done=ts.filter(v=>v==='done').length,shaky=ts.filter(v=>v==='shaky').length,n=qs.length||1;
@@ -9655,6 +10408,49 @@ async function prSend(){const box=document.getElementById('pr-answer'),txt=box.v
 
 P.subs.push(renderWorkshop,renderPrHist);
 prPick();renderWorkshop();renderPrHist();
+// =================== PDF EXPORT ===================
+const IN_CLAUDE=!!(window.claude&&typeof window.claude.use==='function');
+let DL=null;(async function(){try{if(IN_CLAUDE)DL=await window.claude.use('downloads');}catch(e){DL=null;}})();
+function toast(msg,ms){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.setAttribute('role','status');document.body.appendChild(t);}
+  t.innerHTML=msg;t.hidden=false;clearTimeout(t._h);if(ms)t._h=setTimeout(()=>{t.hidden=true;},ms);}
+const slug=s=>s.toLowerCase().replace(/&amp;|&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80)||'export';
+function buildPrintable(els,title){const wrap=document.createElement('div');wrap.className='print-doc print-light';
+  wrap.innerHTML='<div class="print-head"><p class="eyebrow">Interview Prep in 60</p><h1>'+esc(title)+'</h1><p class="note">Exported '+new Date().toLocaleDateString()+'. Animations show the step that was on screen when exported. Live version: interview-prep-in-60.vercel.app</p></div>';
+  els.forEach(el=>{const c=el.cloneNode(true);c.removeAttribute('hidden');c.removeAttribute('id');
+    c.querySelectorAll('.topic,.panel').forEach(x=>x.removeAttribute('hidden'));
+    c.querySelectorAll('.mark,.pager,.controls,.rate,.export-btn,.aibox,.slist,#ws-editor button,input[type=range],.tabs,.map,.maplegend').forEach(x=>x.remove());
+    c.querySelectorAll('details').forEach(d=>{d.open=true;});
+    c.querySelectorAll('[id]').forEach(x=>x.removeAttribute('id'));
+    wrap.appendChild(c);});
+  return wrap;}
+function loadScript(src){return new Promise((res,rej)=>{if(document.querySelector('script[src="'+src+'"]'))return res();const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('load failed'));document.head.appendChild(s);});}
+async function exportPdf(els,title){const filename=slug(title)+'.pdf';
+  if(!IN_CLAUDE){                                             // browser: print view → "Save as PDF" (works offline)
+    let root=document.getElementById('print-root');if(!root){root=document.createElement('div');root.id='print-root';document.body.appendChild(root);}
+    root.innerHTML='';root.appendChild(buildPrintable(els,title));document.body.classList.add('printing');
+    const prevTitle=document.title;document.title=title;
+    const done=()=>{document.body.classList.remove('printing');root.innerHTML='';document.title=prevTitle;window.removeEventListener('afterprint',done);};
+    window.addEventListener('afterprint',done);
+    toast('Choose <b>Save as PDF</b> as the printer to download.',6000);
+    setTimeout(()=>{try{window.print();}catch(e){done();}},60);return;}
+  if(!DL){toast('Saving files isn\'t available in this view. Open the site at interview-prep-in-60.vercel.app to export.',7000);return;}
+  toast('Preparing PDF… (large tabs can take a little while)');
+  try{await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js');
+    const doc=buildPrintable(els,title);doc.style.width='760px';
+    const blob=await window.html2pdf().set({margin:[10,10,12,10],filename,image:{type:'jpeg',quality:0.92},
+      html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',scrollX:0,scrollY:0},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+      pagebreak:{mode:['css','legacy'],avoid:['.widget','pre','tr','.line','.dcard','.callout','.iq details','.cheat > div']}}).from(doc).outputPdf('blob');
+    toast('PDF ready. Confirm the download.');
+    await DL.save({filename,data:blob});toast('Saved '+esc(filename)+'.',4000);}
+  catch(e){const c=e&&e.code;toast(c==='declined'?'Download cancelled.':c==='rate_limited'?'A download prompt is already open.':'Could not create the PDF. Please try again.',5000);}}
+// buttons: every topic/section (in its confidence row) + one per subject tab bar
+document.querySelectorAll('.mark').forEach(m=>{const b=document.createElement('button');b.className='export-btn';b.dataset.export=m.dataset.id;b.textContent='⬇ Export PDF';b.style.marginLeft='auto';m.appendChild(b);});
+document.querySelectorAll('.subject').forEach(sj=>{if(sj.dataset.s==='prep')return;const b=document.createElement('button');b.className='export-btn tab-export';b.dataset.exportTab=sj.dataset.s;b.textContent='⬇ Export this tab as PDF';sj.querySelector('.tabs').appendChild(b);});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-export]');if(b){const el=document.getElementById(b.dataset.export),sj=el.closest('.subject');
+    exportPdf([el],sj.dataset.name+' · '+((el.querySelector('h2')||{}).textContent||'Topic'));return;}
+  const t=e.target.closest('[data-export-tab]');if(t){const sj=document.getElementById('s-'+t.dataset.exportTab),p=sj.querySelector('.panel:not([hidden])'),lab=(sj.querySelector('.tabs [aria-selected="true"]')||{}).textContent||'';
+    exportPdf([p],sj.dataset.name+' · '+lab.replace(/ ·.*$/,''));}});
+
 // =================== THEME SWITCH ===================
 const THEMES=['auto','light','dark'];let curTheme='auto',ownTheme=false;
 function applyTheme(t){if(!THEMES.includes(t))t='auto';curTheme=t;const root=document.documentElement;
@@ -9671,7 +10467,7 @@ const SUBJ=[...document.querySelectorAll('.subject')],sideNav=document.getElemen
 const topicsOf=s=>[...document.querySelectorAll('#s-'+s+' .topic')];
 const DSA_DEEP={bigo:'d-bigo',hash:'d-hash',two:'d-two',slide:'d-slide',stack:'d-stack',bs:'d-bs',ll:'d-ll',tree:'d-tree',graph:'d-graph',bt:'d-bt',dp:'d-dp'};
 Object.entries(DSA_DEEP).forEach(([sec,id])=>{document.getElementById(sec).dataset.deep=id;});
-const BADGE={prep:'✓',dsa:'{ }',se:'&lt;/&gt;',ds:'⇄',sr:'★',ai:'AI',mb:'▯',bl:'“ ”'};
+const BADGE={prep:'✓',dsa:'{ }',se:'&lt;/&gt;',ds:'⇄',sr:'★',ai:'AI',mb:'▯',fe:'&lt;&gt;',bl:'“ ”'};
 SUBJ.forEach(sj=>{const s=sj.dataset.s,T=topicsOf(s);
   T.forEach((t,i)=>{t.querySelector('.eyebrow').textContent='Deep dive · topic '+(i+1)+' of '+T.length;
     const pg=document.createElement('div');pg.className='pager';
@@ -9712,7 +10508,7 @@ function go(s,v,t,scroll){const sj=document.getElementById('s-'+s);if(!sj)return
   closeMenu();
   if(scroll){if(v==='deep'&&scroll==='topic')sj.querySelector('.panel[data-panel="deep"]').scrollIntoView({block:'start'});else window.scrollTo(0,0);}}
 sideNav.addEventListener('click',e=>{const b=e.target.closest('button');if(b)go(b.dataset.s,b.dataset.v,b.dataset.t,true);});
-SUBJ.forEach(sj=>{sj.querySelector('.tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;go(sj.dataset.s,b.dataset.tab,null,false);sj.querySelector('.tabs').scrollIntoView({block:'start'});});
+SUBJ.forEach(sj=>{sj.querySelector('.tabs').addEventListener('click',e=>{const b=e.target.closest('button[data-tab]');if(!b)return;go(sj.dataset.s,b.dataset.tab,null,false);sj.querySelector('.tabs').scrollIntoView({block:'start'});});
   sj.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(sj.dataset.s,'deep',b.dataset.go,'topic');});});
 document.getElementById('menu-btn').addEventListener('click',()=>{const o=document.body.classList.toggle('menu-open');document.getElementById('menu-btn').setAttribute('aria-expanded',String(o));});
 document.getElementById('scrim').addEventListener('click',closeMenu);
@@ -9741,5 +10537,16 @@ function draw(){if(done||!window.mermaid||!panel||panel.hidden||panel.closest('.
   try{mermaid.initialize({startOnLoad:false,theme:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'default'});
     Promise.resolve(mermaid.run({querySelector:'pre.mermaid'})).catch(function(){done=false;});}catch(e){done=false;}}
 new MutationObserver(draw).observe(document.body,{subtree:true,attributes:true,attributeFilter:['hidden']});draw();})();</script>
+<script>(function(){
+  var side=document.querySelector('.side .brand'),el=document.createElement('p');
+  el.className='syncnote';el.id='net-status';if(side)side.insertAdjacentElement('afterend',el);
+  function show(){var off=!navigator.onLine,ready=!!(navigator.serviceWorker&&navigator.serviceWorker.controller);
+    el.textContent=off?(ready?'● Offline: using the saved copy':'● Offline'):(ready?'✓ Available offline':'');}
+  addEventListener('online',show);addEventListener('offline',show);show();
+  if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1')){
+    addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').then(function(){
+      navigator.serviceWorker.ready.then(function(){setTimeout(show,500);});}).catch(function(){});});
+    navigator.serviceWorker.addEventListener('controllerchange',show);}
+})();</script>
 </body>
 </html>
